@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل المصادر المفتوحة (OSINT) | عرض تقديمي تفاعلي متطور</title>
+    <meta name="description" content="عرض تقديمي تفاعلي احترافي حول تحليل المصادر المفتوحة OSINT مع وضع التقديم، الانتقالات السينمائية، ملاحظات المحاضر، ووضع مقدم العرض.">
+
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5.3.3 RTL CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" integrity="sha384-dpuaG1suU0eT09tx5plTaGMLBsfDLzUCCUXOY2j/LSvXYuG6Bqs43ALlhIqAJVRb" crossorigin="anonymous">
+
+    <!-- Font Awesome 6.5.1 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Animate.css CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- React & ReactDOM 18 UMD CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel Standalone CDN for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           OSINT Keynote & PowerPoint-Style Presentation Engine Styles
+           ========================================================================== */
+        :root {
+            --osint-bg-dark: #050811;
+            --osint-bg-navy: #0a1124;
+            --osint-electric: #00d2ff;
+            --osint-blue: #3b82f6;
+            --osint-purple: #8b5cf6;
+            --osint-green: #10b981;
+            --osint-amber: #f59e0b;
+            --osint-rose: #f43f5e;
+            --osint-glass: rgba(13, 20, 40, 0.76);
+            --osint-glass-strong: rgba(15, 23, 48, 0.92);
+            --osint-border: rgba(0, 210, 255, 0.24);
+            --osint-text: #f8fafc;
+            --osint-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body, #root {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--osint-bg-dark);
+            color: var(--osint-text);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Stage & Parallax Background */
+        .presentation-stage {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 18% 20%, rgba(0, 210, 255, 0.14), transparent 44%),
+                radial-gradient(circle at 82% 78%, rgba(139, 92, 246, 0.16), transparent 46%),
+                linear-gradient(160deg, #040711 0%, #091024 55%, #050811 100%);
+            display: flex;
+            flex-direction: column;
+            perspective: 1400px;
+        }
+
+        .tech-grid-overlay {
+            position: absolute;
+            inset: -24px;
+            background-image:
+                linear-gradient(to right, rgba(0, 210, 255, 0.055) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 210, 255, 0.055) 1px, transparent 1px);
+            background-size: 46px 46px;
+            pointer-events: none;
+            z-index: 0;
+            transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .ambient-glow-layer {
+            position: absolute;
+            inset: -30px;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(circle at 25% 30%, rgba(0, 210, 255, 0.09), transparent 38%),
+                radial-gradient(circle at 75% 70%, rgba(139, 92, 246, 0.11), transparent 40%);
+            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Presentation Mode vs Overview Stage */
+        .presentation-mode-active .slide-viewport {
+            padding: 1.25rem 2.25rem 5.25rem;
+        }
+
+        .presentation-mode-active .slide-canvas {
+            max-width: 1380px;
+            min-height: calc(100vh - 6.8rem);
+        }
+
+        .presentation-mode-active .slide-title-main {
+            font-size: clamp(1.95rem, 3.2vw, 2.95rem) !important;
+        }
+
+        .presentation-mode-active .glass-card {
+            border-color: rgba(0, 210, 255, 0.36);
+            background: rgba(12, 19, 38, 0.88);
+        }
+
+        /* Top Progress Bar */
+        .top-progress-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            z-index: 1060;
+        }
+
+        .top-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--osint-electric), var(--osint-purple), var(--osint-green));
+            transition: width 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 12px rgba(0, 210, 255, 0.75);
+        }
+
+        /* Top Start Presentation Bar (when not in Presentation Mode) */
+        .top-launcher-bar {
+            position: fixed;
+            top: 10px;
+            left: 16px;
+            right: 16px;
+            z-index: 1045;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .top-launcher-bar > * {
+            pointer-events: auto;
+        }
+
+        /* Slide Viewport Container */
+        .slide-viewport {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 3.4rem 2rem 5.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-canvas {
+            width: 100%;
+            max-width: 1320px;
+            min-height: calc(100vh - 8.5rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+
+        /* ==========================================================================
+           Cinematic Slide Transitions (7 Modes)
+           ========================================================================== */
+        .trans-fade {
+            animation: cineFade 0.52s ease forwards;
+        }
+        @keyframes cineFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .trans-slide {
+            animation: cineSlideDir 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes cineSlideDir {
+            from {
+                opacity: 0;
+                transform: translateX(var(--slide-enter-x, -55px));
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .trans-zoom {
+            animation: cineZoom 0.52s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes cineZoom {
+            from {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .trans-cinematic {
+            animation: cineReveal 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes cineReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(22px) scale(0.97);
+                filter: brightness(1.45);
+            }
+            65% {
+                filter: brightness(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: brightness(1);
+            }
+        }
+
+        .trans-flip {
+            animation: cineFlip3D 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes cineFlip3D {
+            from {
+                opacity: 0;
+                transform: rotateY(var(--flip-angle, 14deg)) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: rotateY(0deg) scale(1);
+            }
+        }
+
+        .trans-parallax {
+            animation: cineParallaxSlide 0.56s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes cineParallaxSlide {
+            from {
+                opacity: 0;
+                transform: translateX(var(--slide-enter-x, -42px)) translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) translateY(0);
+            }
+        }
+
+        .trans-blur {
+            animation: cineBlur 0.52s ease forwards;
+        }
+        @keyframes cineBlur {
+            from {
+                opacity: 0;
+                filter: blur(10px);
+                transform: scale(0.99);
+            }
+            to {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1);
+            }
+        }
+
+        /* ==========================================================================
+           Progressive Element Reveal Inside Each Slide (Fade In, Slide Up, Scale In)
+           ========================================================================== */
+        .reveal-item {
+            transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .reveal-hidden {
+            opacity: 0;
+            transform: translateY(18px) scale(0.97);
+            pointer-events: none;
+        }
+
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .reveal-scale-visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .reveal-scale-hidden {
+            opacity: 0;
+            transform: scale(0.92);
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--osint-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--osint-border);
+            border-radius: 20px;
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.38);
+            transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 210, 255, 0.52);
+            box-shadow: 0 18px 40px rgba(0, 210, 255, 0.14);
+        }
+
+        .text-electric {
+            color: var(--osint-electric) !important;
+        }
+
+        .text-purple-glow {
+            color: #a78bfa !important;
+        }
+
+        .text-green-tech {
+            color: var(--osint-green) !important;
+        }
+
+        .gradient-heading {
+            background: linear-gradient(135deg, #ffffff 10%, var(--osint-electric) 55%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .badge-osint {
+            background: rgba(0, 210, 255, 0.14);
+            color: var(--osint-electric);
+            border: 1px solid rgba(0, 210, 255, 0.35);
+            font-weight: 700;
+            padding: 0.36rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.84rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .badge-purple {
+            background: rgba(139, 92, 246, 0.16);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            font-weight: 700;
+            padding: 0.34rem 0.85rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            font-weight: 700;
+            padding: 0.34rem 0.85rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+        }
+
+        .slide-header-row {
+            margin-bottom: 1.25rem;
+        }
+
+        .slide-title-main {
+            font-weight: 900;
+            font-size: clamp(1.7rem, 2.75vw, 2.5rem);
+            margin: 0.4rem 0 0.2rem;
+            line-height: 1.25;
+        }
+
+        .slide-subtitle-lead {
+            color: var(--osint-muted);
+            font-size: 1.02rem;
+            margin: 0;
+        }
+
+        /* Methodology Pipeline */
+        .pipeline-step {
+            position: relative;
+            padding: 1.05rem;
+            border-radius: 18px;
+            background: var(--osint-glass-strong);
+            border: 1px solid rgba(0, 210, 255, 0.28);
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .pipeline-step.revealed {
+            border-color: var(--osint-electric);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.18);
+        }
+
+        .step-num-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--osint-electric), var(--osint-purple));
+            color: #050811;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.98rem;
+            flex-shrink: 0;
+        }
+
+        /* ==========================================================================
+           Auto-Hiding Control Dock
+           ========================================================================== */
+        .control-dock {
+            position: fixed;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            z-index: 1050;
+            background: rgba(8, 13, 28, 0.9);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(0, 210, 255, 0.34);
+            border-radius: 999px;
+            padding: 0.42rem 0.85rem;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            max-width: 97vw;
+            overflow-x: auto;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        .control-dock.dock-hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(28px);
+            pointer-events: none;
+        }
+
+        .dock-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--osint-text);
+            border-radius: 999px;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .dock-btn:hover:not(:disabled) {
+            background: rgba(0, 210, 255, 0.2);
+            border-color: var(--osint-electric);
+            color: #ffffff;
+        }
+
+        .dock-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .dock-btn.active-mode {
+            background: linear-gradient(135deg, var(--osint-electric), var(--osint-purple));
+            color: #050811;
+            border-color: transparent;
+        }
+
+        .slide-counter-pill {
+            background: rgba(0, 210, 255, 0.15);
+            border: 1px solid rgba(0, 210, 255, 0.38);
+            color: var(--osint-electric);
+            padding: 0.32rem 0.8rem;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        /* Drawer & Speaker Notes Panel & Presenter View Modal */
+        .slide-drawer-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 5, 14, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 1070;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .slide-drawer-panel {
+            width: 350px;
+            max-width: 90vw;
+            height: 100%;
+            background: #080e1f;
+            border-left: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 1.25rem;
+            overflow-y: auto;
+            box-shadow: 10px 0 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .drawer-slide-item {
+            padding: 0.7rem 0.85rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .drawer-slide-item:hover {
+            border-color: var(--osint-electric);
+            background: rgba(0, 210, 255, 0.08);
+        }
+
+        .drawer-slide-item.current {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.2), rgba(139, 92, 246, 0.2));
+            border-color: var(--osint-electric);
+        }
+
+        .speaker-notes-panel {
+            position: fixed;
+            bottom: 74px;
+            left: 16px;
+            width: 440px;
+            max-width: calc(100vw - 32px);
+            max-height: 68vh;
+            overflow-y: auto;
+            z-index: 1065;
+            background: rgba(7, 12, 26, 0.96);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            border-radius: 20px;
+            padding: 1.25rem;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75);
+        }
+
+        .presenter-view-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1080;
+            background: #040711;
+            overflow-y: auto;
+            padding: 1.25rem;
+        }
+
+        .pulse-node {
+            animation: pulseRing 2.8s infinite;
+        }
+
+        @keyframes pulseRing {
+            0%, 100% { opacity: 0.9; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .slide-viewport {
+                padding: 3.4rem 0.9rem 5.2rem;
+                align-items: flex-start;
+            }
+            .slide-canvas {
+                min-height: auto;
+            }
+            .dock-btn span.btn-label {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const TOTAL_SLIDES = 12;
+
+        const TRANSITION_MODES = [
+            { id: 'cinematic', label: 'Cinematic Reveal (إضاءة وظهور سينمائي)' },
+            { id: 'fade', label: 'Fade Transition (ظهور واختفاء ناعم)' },
+            { id: 'slide', label: 'Slide Transition (انتقال انسيابي أفقي)' },
+            { id: 'zoom', label: 'Zoom Transition (تكبير وتصغير خفيف)' },
+            { id: 'flip', label: '3D Flip (دوران ثلاثي الأبعاد خفيف)' },
+            { id: 'parallax', label: 'Parallax Effect (عمق وحركة متعددة الطبقات)' },
+            { id: 'blur', label: 'Blur Transition (انتقال ضبابي ناعم)' }
+        ];
+
+        const SLIDE_INDEX_TITLES = [
+            { num: 1, title: 'العنوان الرئيسي: OSINT', tag: 'المقدمة' },
+            { num: 2, title: 'ما هو تحليل المصادر المفتوحة؟', tag: 'المفهوم' },
+            { num: 3, title: 'منهجية البحث والتحليل (5 مراحل)', tag: 'المنهجية' },
+            { num: 4, title: 'أقسام OSINT الرئيسية', tag: 'التخصصات' },
+            { num: 5, title: 'التحليل التقني والأمن السيبراني', tag: 'Cyber OSINT' },
+            { num: 6, title: 'التحقق الجغرافي والبصري', tag: 'Geolocation' },
+            { num: 7, title: 'أبحاث السوق والبيانات التجارية', tag: 'Business OSINT' },
+            { num: 8, title: 'تحليل منصات التواصل الاجتماعي', tag: 'Social Media' },
+            { num: 9, title: 'تتبع البصمة الرقمية', tag: 'Digital Footprint' },
+            { num: 10, title: 'OSINT في الحياة اليومية', tag: 'التطبيقات' },
+            { num: 11, title: 'الضوابط الأخلاقية والقانونية', tag: 'الحوكمة والأخلاق' },
+            { num: 12, title: 'الخاتمة: المعرفة تبدأ من البيانات', tag: 'الخلاصة' }
+        ];
+
+        /* ==========================================================================
+           Rich Speaker Notes for All 12 Slides (Arabic Eloquence & Practical Delivery)
+           ========================================================================== */
+        const SPEAKER_NOTES_DATA = {
+            1: {
+                slideTitle: 'تحليل المصادر المفتوحة (OSINT)',
+                intro: 'أرحّب بكم جميعاً في هذه الجلسة العلمية والتقنية، حيث نناقش أحد أهم مسارات البحث والتحليل في عصر المعلومات وهو تحليل المصادر المفتوحة OSINT.',
+                explanation: 'نركز اليوم على الإطار المنهجي والعلمي لهذا التخصص، وكيف تختلف المصادر المفتوحة عن جمع المعلومات العشوائي، مع استعراض أبرز أقسامه وتطبيقاته المدنية والمهنية.',
+                example: 'في كثير من الحالات، تكون المعلومة المطلوبة متاحة بالفعل للعامة في تقارير أو خرائط أو سجلات مفتوحة، لكن التحدي الحقيقي يكمن في معرفة أين نبحث وكيف نربط الأدلة.',
+                question: 'برأيكم، ما أكبر تحدٍ يواجه الباحث اليوم وسط هذا الكم الهائل من البيانات المتاحة للعلن؟',
+                transition: 'لنبدأ أولاً بتحديد المفهوم الدقيق لتحليل المصادر المفتوحة والقاعدة الذهبية التي تحكم عمله.'
+            },
+            2: {
+                slideTitle: 'ما هو تحليل المصادر المفتوحة؟',
+                intro: 'يظن البعض أن OSINT مجرد بحث سريع في الإنترنت، لكنه في الحقيقة منهجية منظمة تمر بالجمع والتصفية والتحليل وفق ضوابط قانونية واضحة.',
+                explanation: 'جوهر العمل هنا هو تقليل الضوضاء الرقمية الهائلة واستخراج إشارات ذات معنى؛ والمصادر المفتوحة تشمل المصادر المجانية مثل محركات البحث وكذلك المصادر المدفوعة المشروعة مثل قواعد البيانات التجارية.',
+                example: 'لو أراد فريق أبحاث فهم سبب ارتفاع أعطال خدمة معينة، فإن فرز البلاغات العلنية وتصنيفها حسب النسخة والمنطقة يحوّل ضوضاء المنشورات إلى تشخيص واضح.',
+                question: 'هل سبق أن اعتمدتم على مصدر مدفوع أو قاعدة بيانات متخصصة ضمن بحث مفتوح ومشروع؟',
+                transition: 'بعد أن اتضح المفهوم، نستعرض في الشريحة التالية الخطوات الخمس التي تبني هذا التحليل خطوة بخطوة.'
+            },
+            3: {
+                slideTitle: 'منهجية البحث والتحليل',
+                intro: 'لكي يكون البحث قابلاً للتكرار والمراجعة العلمية، نلتزم بخمس مراحل متسلسلة تبدأ بالسؤال البحثي الدقيق وتنتهي بالتوثيق الواضح.',
+                explanation: 'تحديد الهدف يمنع التشتت في بحر البيانات؛ ثم يأتي الجمع والتصفية لإزالة التكرار؛ وبعدها التحليل والتحقق من مصادر متعددة قبل كتابة التقرير النهائي.',
+                example: 'إذا كان السؤال البحثي: "هل هذه الصورة حقيقية؟"، نبدأ بجمع البيانات السياقية، ثم نصفي التفاصيل، ثم نتحقق من الموقع والظلال قبل الحكم بصحة الصورة.',
+                question: 'أي مرحلة من المراحل الخمس ترون أنها الأكثر عرضة للخطأ البشري إذا أُهملت؟',
+                transition: 'تُطبَّق هذه المنهجية عبر عدة تخصصات رئيسية، وهو ما ننتقل إليه في الشريحة القادمة.'
+            },
+            4: {
+                slideTitle: 'أقسام OSINT الرئيسية',
+                intro: 'ينقسم مجال OSINT إلى تخصصات متكاملة تخدم الأمن السيبراني، الصحافة، الأعمال، وتحليل البصمة الرقمية.',
+                explanation: 'كل قسم يمتلك أدواته ومعاييره الخاصة، لكن القاسم المشترك بينها هو الالتزام بالقانون والتحقق المنهجي من صحة المعلومات.',
+                example: 'في تحقيق استقصائي واحد، قد يجمع الباحث بين التحقق الجغرافي لمكان الحدث وتحليل المنشورات العامة لتأكيد التسلسل الزمني.',
+                question: 'أي من هذه الأقسام الخمسة يرتبط بشكل أقرب بمجال دراستكم أو عملكم الحالي؟',
+                transition: 'نبدأ باستعراض هذه الأقسام تفصيلياً انطلاقاً من التحليل التقني والأمن السيبراني.'
+            },
+            5: {
+                slideTitle: 'Cyber OSINT — التحليل التقني والأمن السيبراني',
+                intro: 'يركز Cyber OSINT على فهم ما يظهر من أصول رقمية وخدمات لمؤسسة معينة أمام العالم الخارجي بهدف تعزيز الحماية.',
+                explanation: 'يشمل حصر سطح الهجوم، وفحص الأجهزة المتصلة عبر محركات متخصصة مثل Shodan ضمن نطاق مصرح به، ورصد تسريبات البيانات لاتخاذ إجراءات وقائية فورية.',
+                example: 'اكتشاف خادم اختبار قديم أو قاعدة بيانات غير محمية مكشوفة للعامة يتيح لفريق الأمن إغلاقها أو تقييد الوصول إليها قبل استغلالها.',
+                question: 'لماذا يُعد حصر سطح الهجوم خطوة وقائية أساسية لأي مؤسسة تتحول رقمياً؟',
+                transition: 'من الأصول التقنية والرقمية، ننتقل إلى التحقق الجغرافي والبصري للصور والوقائع.'
+            },
+            6: {
+                slideTitle: 'Geolocation & Visual Verification — التحقق الجغرافي والبصري',
+                intro: 'في عصر الصور والمقاطع السريعة الانتشار، يصبح التحقق البصري والمكاني خط الدفاع الأول ضد التضليل.',
+                explanation: 'نعتمد على مطابقة المعالم الثابتة كالمباني والجبال مع الخرائط، وتحليل الظلال والطقس لتقدير التوقيت، إضافة إلى البحث العكسي لكشف الصور القديمة.',
+                example: 'صورة من ساحة عامة يُدّعى أنها التُقطت في وقت معين يمكن اختبارها بمقارنة موقع المعالم واتجاه الظلال مع الخرائط والبيانات الفلكية والطقسية.',
+                question: 'ما أول خطوة تقومون بها عادةً عند مشاهدة صورة مثيرة للجدل على منصات التواصل؟',
+                transition: 'بعيداً عن الميدان الإخباري، يبرز دور البيانات المفتوحة بوضوح في عالم الأعمال والأسواق.'
+            },
+            7: {
+                slideTitle: 'Business OSINT — أبحاث السوق والبيانات التجارية',
+                intro: 'تستخدم المؤسسات والمستثمرون تحليل المصادر المفتوحة لاتخاذ قرارات مبنية على شواهد سوقية وقانونية واضحة.',
+                explanation: 'يشمل ذلك قراءة تحركات المنافسين المعلنة، وفحص السجلات التجارية وبراءات الاختراع والدعاوى العامة، وتتبع سلاسل الإمداد عبر سجلات الشحن والجمارك.',
+                example: 'قبل الدخول في شراكة تجارية، تساعد مراجعة السجلات التجارية العلنية وبراءات الاختراع على تقييم الملاءة والخبرة الفعلية للطرف الآخر.',
+                question: 'كيف يمكن للشركات الصغيرة الاستفادة من Business OSINT دون ميزانيات بحث ضخمة؟',
+                transition: 'ومن بيانات الشركات والأسواق، ننتقل إلى تحليل التفاعلات العامة في منصات التواصل.'
+            },
+            8: {
+                slideTitle: 'Social Media OSINT — تحليل منصات التواصل الاجتماعي',
+                intro: 'تُعد منصات التواصل مرآة سريعة لتوجهات الجمهور، لكنها مليئة بالضجيج والحسابات المنسقة أحياناً.',
+                explanation: 'نستخدم التحليل لفهم مشاعر الجمهور، والرصد المبكر للشائعات لإدارة الأزمات بهدوء، وكشف الشبكات الوهمية عبر تحليل أنماط النشاط.',
+                example: 'إذا ظهرت موجة تقييمات أو منشورات متطابقة الصياغة في وقت ضيق جداً، فإن تحليل الأنماط يساعد على تمييز النشاط المنسق عن رأي الجمهور الحقيقي.',
+                question: 'ما الفارق بين رصد أزمة ناشئة مبكراً وبين الانتظار حتى تتفاقم على المنصات؟',
+                transition: 'بعد النظر إلى الجمهور العام، ننتقل إلى البصمة الرقمية للفرد والهوية المهنية.'
+            },
+            9: {
+                slideTitle: 'Digital Footprint Analysis — تتبع البصمة الرقمية',
+                intro: 'كل تفاعل أو حساب أو ملف نتركه عبر الإنترنت يشكّل بصمة رقمية قد تبقى لسنوات.',
+                explanation: 'يفيد هذا التحليل الأفراد في تقليص ما ينكشف من بياناتهم الشخصية، كما يساعد جهات التوظيف والبحث في التحقق من الهوية المهنية والأكاديمية.',
+                example: 'قد يكشف البحث عن بريد إلكتروني أو اسم مستخدم قديم عن حسابات أو ملفات قديمة نسي صاحبها إغلاقها أو تحديث خصوصيتها.',
+                question: 'متى كانت آخر مرة راجعتم فيها إعدادات الخصوصية والحسابات المرتبطة ببريدكم الإلكتروني؟',
+                transition: 'نرى الآن كيف تترجم هذه المفاهيم إلى تطبيقات مدنية وإنسانية مباشرة في الحياة اليومية.'
+            },
+            10: {
+                slideTitle: 'OSINT في الحياة اليومية',
+                intro: 'لا يقتصر OSINT على الجوانب التقنية أو التجارية، بل يخدم الصحافة المسؤولة، وإدارة الكوارث، والبحث العلمي.',
+                explanation: 'تُسهم البيانات المفتوحة والخرائط والصور الفضائية في توثيق القضايا البيئية، وتوجيه فرق الإغاثة نحو المناطق الأكثر تضرراً، ودعم الدراسات الاجتماعية والاقتصادية.',
+                example: 'أثناء الكوارث الطبيعية كالفيضانات أو الزلازل، تساعد خرائط البيانات المفتوحة ومؤشرات السكان على تحديد الطرق المتضررة وتوزيع المساعدات بكفاءة.',
+                question: 'أي تطبيق مدني للبيانات المفتوحة لفت انتباهكم أكثر في هذه الشريحة؟',
+                transition: 'ومع اتساع هذه التطبيقات، تبرز ضرورة الالتزام الصارم بالضوابط الأخلاقية والقانونية.'
+            },
+            11: {
+                slideTitle: 'الضوابط الأخلاقية والقانونية',
+                intro: 'قوة المعلومات المفتوحة تتطلب انضباطاً أخلاقياً وقانونياً صارماً؛ فالوصول العلني لا يبرر أي إساءة استخدام.',
+                explanation: 'نلتزم بالقانون فلا نتجاوز صلاحيات أو نخترق أنظمة، ونتحقق من المصادر الأولية لتجنب التحيز، ونحمي خصوصية الباحث أثناء العمل.',
+                example: 'تجاوز كلمة مرور أو الوصول إلى بيانات محظورة ليس من OSINT، كما أن نقل شائعة دون تحقق من مصدرها الأساسي يضر بالمصداقية.',
+                question: 'كيف نوازن بين حرية البحث والاستقصاء وبين احترام الخصوصية والقانون؟',
+                transition: 'نصل الآن إلى الخلاصة الختامية لنلخص الرسالة الجوهرية للعرض.'
+            },
+            12: {
+                slideTitle: 'المعرفة تبدأ من البيانات',
+                intro: 'نختتم بالتأكيد على أن البيانات المفتوحة أداة قوية، لكن قيمتها الحقيقية تكمن في منهجية التحقق والربط المنطقي.',
+                explanation: 'كثرة البيانات وحدها قد تربك الباحث، بينما التحليل الدقيق والموضوعي هو الذي يولّد معرفة موثوقة تدعم القرار الصحيح.',
+                example: 'باحث يمتلك عشرة مصادر موثوقة ومتقاطعة يتفوق على من يجمع آلاف الروابط غير المدققة.',
+                question: 'ما الفكرة الأساسية التي ستأخذونها معكم من محاضرة اليوم وتطبقونها في أبحاثكم أو عملكم؟',
+                transition: 'أشكركم جزيل الشكر على حسن استماعكم وتفاعلكم، وأرحب بأسئلتكم وملاحظاتكم.'
+            }
+        };
+
+        /* ==========================================================================
+           Progressive Element Wrapper Component
+           ========================================================================== */
+        const RevealBlock = ({ visible, stepIndex, currentStep, children, className = '', scaleOnly = false }) => {
+            const delayMs = Math.min(stepIndex * 65, 260);
+            const stateClass = visible
+                ? (scaleOnly ? 'reveal-scale-visible' : 'reveal-visible')
+                : (scaleOnly ? 'reveal-scale-hidden' : 'reveal-hidden');
+
+            return (
+                <div
+                    className={`reveal-item ${stateClass} ${className}`}
+                    style={{ transitionDelay: visible ? `${delayMs}ms` : '0ms' }}
+                >
+                    {children}
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Reusable Chart.js Wrapper Component
+           ========================================================================== */
+        const OsintChart = ({ type, data, options, height = '225px' }) => {
+            const canvasRef = useRef(null);
+            const chartInstanceRef = useRef(null);
+
+            useEffect(() => {
+                if (!canvasRef.current || !window.Chart) return;
+                if (chartInstanceRef.current) {
+                    chartInstanceRef.current.destroy();
+                }
+
+                const ctx = canvasRef.current.getContext('2d');
+                chartInstanceRef.current = new window.Chart(ctx, {
+                    type,
+                    data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#e2e8f0',
+                                    font: { family: 'Cairo', size: 12, weight: 'bold' }
+                                }
+                            },
+                            tooltip: {
+                                titleFont: { family: 'Cairo', size: 13 },
+                                bodyFont: { family: 'Cairo', size: 12 }
+                            }
+                        },
+                        ...options
+                    }
+                });
+
+                return () => {
+                    if (chartInstanceRef.current) {
+                        chartInstanceRef.current.destroy();
+                    }
+                };
+            }, [type, data, options]);
+
+            return (
+                <div style={{ position: 'relative', height, width: '100%' }}>
+                    <canvas ref={canvasRef}></canvas>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 1: العنوان الرئيسي
+           ========================================================================== */
+        const Slide1Title = ({ revealStep, presenterName, setPresenterName, presentationDate, setPresentationDate }) => {
+            return (
+                <div className="row align-items-center g-4 py-1">
+                    <div className="col-lg-7">
+                        <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                            <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                <span className="badge-osint">
+                                    <i className="fa-solid fa-satellite-dish"></i>
+                                    <span>OSINT INTELLIGENCE</span>
+                                </span>
+                                <span className="badge-purple">
+                                    <i className="fa-solid fa-graduation-cap me-1"></i>
+                                    عرض تقديمي تفاعلي احترافي
+                                </span>
+                            </div>
+
+                            <h1 className="slide-title-main gradient-heading" style={{ fontSize: 'clamp(2.15rem, 3.9vw, 3.45rem)' }}>
+                                تحليل المصادر المفتوحة (OSINT)
+                            </h1>
+                            <h2 className="h3 fw-bold text-electric mb-2">
+                                المنهجية، الأقسام، والتطبيقات المدنية والتقنية
+                            </h2>
+                        </RevealBlock>
+
+                        <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep}>
+                            <p className="lead text-light opacity-90 mb-3" style={{ maxWidth: '650px', lineHeight: '1.7' }}>
+                                كيف نستخرج المعرفة والحلول من البيانات المتاحة للجمهور في عصر المعلومات.
+                            </p>
+                        </RevealBlock>
+
+                        <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep}>
+                            <div className="glass-card p-3" style={{ maxWidth: '650px' }}>
+                                <div className="row g-2 align-items-center">
+                                    <div className="col-sm-7">
+                                        <label className="form-label small text-electric fw-bold mb-1">
+                                            <i className="fa-solid fa-user-tie me-1"></i> مقدم العرض:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control form-control-sm bg-dark text-light border-info border-opacity-50"
+                                            value={presenterName}
+                                            onChange={(e) => setPresenterName(e.target.value)}
+                                            placeholder="أدخل اسم مقدم العرض..."
+                                        />
+                                    </div>
+                                    <div className="col-sm-5">
+                                        <label className="form-label small text-purple-glow fw-bold mb-1">
+                                            <i className="fa-regular fa-calendar-check me-1"></i> تاريخ العرض:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control form-control-sm bg-dark text-light border-info border-opacity-50"
+                                            value={presentationDate}
+                                            onChange={(e) => setPresentationDate(e.target.value)}
+                                            placeholder="تاريخ العرض..."
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </RevealBlock>
+                    </div>
+
+                    <div className="col-lg-5">
+                        <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep} scaleOnly>
+                            <div className="glass-card p-4 text-center pulse-node">
+                                <svg viewBox="0 0 420 330" className="w-100" style={{ maxHeight: '320px' }} role="img" aria-label="شبكة بيانات عالمية تمثل تحليل المصادر المفتوحة OSINT">
+                                    <defs>
+                                        <radialGradient id="globeGrad" cx="40%" cy="35%" r="60%">
+                                            <stop offset="0%" stopColor="#00d2ff" stopOpacity="0.35" />
+                                            <stop offset="65%" stopColor="#3b82f6" stopOpacity="0.14" />
+                                            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.06" />
+                                        </radialGradient>
+                                        <linearGradient id="linkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stopColor="#00d2ff" />
+                                            <stop offset="100%" stopColor="#a78bfa" />
+                                        </linearGradient>
+                                    </defs>
+
+                                    <circle cx="210" cy="165" r="138" fill="none" stroke="rgba(0,210,255,0.22)" strokeWidth="1.5" strokeDasharray="6 6" />
+                                    <circle cx="210" cy="165" r="102" fill="url(#globeGrad)" stroke="rgba(0,210,255,0.45)" strokeWidth="1.8" />
+                                    <ellipse cx="210" cy="165" rx="102" ry="40" fill="none" stroke="rgba(167,139,250,0.45)" strokeWidth="1.2" />
+                                    <ellipse cx="210" cy="165" rx="44" ry="102" fill="none" stroke="rgba(0,210,255,0.35)" strokeWidth="1.2" />
+
+                                    <line x1="210" y1="165" x2="85" y2="65" stroke="url(#linkGrad)" strokeWidth="2" />
+                                    <line x1="210" y1="165" x2="340" y2="72" stroke="url(#linkGrad)" strokeWidth="2" />
+                                    <line x1="210" y1="165" x2="72" y2="250" stroke="url(#linkGrad)" strokeWidth="2" />
+                                    <line x1="210" y1="165" x2="348" y2="254" stroke="url(#linkGrad)" strokeWidth="2" />
+
+                                    <circle cx="210" cy="165" r="36" fill="#09132b" stroke="#00d2ff" strokeWidth="3" />
+                                    <text x="210" y="161" textAnchor="middle" fill="#00d2ff" fontSize="14" fontWeight="900">OSINT</text>
+                                    <text x="210" y="178" textAnchor="middle" fill="#e2e8f0" fontSize="9.5" fontWeight="700">بيانات مفتوحة</text>
+
+                                    <circle cx="85" cy="65" r="22" fill="#0d1936" stroke="#10b981" strokeWidth="2" />
+                                    <text x="85" y="68" textAnchor="middle" fill="#34d399" fontSize="9.5" fontWeight="700">سجلات</text>
+
+                                    <circle cx="340" cy="72" r="22" fill="#0d1936" stroke="#a78bfa" strokeWidth="2" />
+                                    <text x="340" y="75" textAnchor="middle" fill="#c4b5fd" fontSize="9.5" fontWeight="700">خرائط</text>
+
+                                    <circle cx="72" cy="250" r="22" fill="#0d1936" stroke="#00d2ff" strokeWidth="2" />
+                                    <text x="72" y="253" textAnchor="middle" fill="#00d2ff" fontSize="9.5" fontWeight="700">شبكات</text>
+
+                                    <circle cx="348" cy="254" r="22" fill="#0d1936" stroke="#f59e0b" strokeWidth="2" />
+                                    <text x="348" y="257" textAnchor="middle" fill="#fbbf24" fontSize="9.5" fontWeight="700">أخبار</text>
+                                </svg>
+                                <div className="small text-muted-custom mt-1">
+                                    ربط المصادر العلنية المتنوعة لاستخلاص رؤى دقيقة وموثوقة
+                                </div>
+                            </div>
+                        </RevealBlock>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 2: مقدمة ومفهوم OSINT
+           ========================================================================== */
+        const Slide2Concept = ({ revealStep }) => {
+            const [showExample, setShowExample] = useState(false);
+
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row d-flex flex-wrap justify-content-between align-items-end gap-2">
+                            <div>
+                                <span className="badge-osint"><i className="fa-solid fa-circle-info"></i> المفهوم والقاعدة الذهبية</span>
+                                <h2 className="slide-title-main gradient-heading">ما هو تحليل المصادر المفتوحة؟</h2>
+                            </div>
+                            <button
+                                className="btn btn-sm btn-outline-info rounded-pill px-3 fw-bold"
+                                onClick={() => setShowExample(!showExample)}
+                            >
+                                <i className="fa-solid fa-lightbulb me-1"></i>
+                                {showExample ? 'إخفاء المثال التوضيحي' : 'إظهار مثال عملي للتحول'}
+                            </button>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-4 align-items-stretch">
+                        <div className="col-lg-7">
+                            <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep} className="h-100">
+                                <div className="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <h4 className="fw-bold text-electric mb-2">
+                                            <i className="fa-solid fa-book-open-reader me-2"></i>
+                                            التعريف العملي
+                                        </h4>
+                                        <p className="fs-6 lh-lg mb-3">
+                                            <strong>OSINT</strong> هو منهجية علمية وتقنية لجمع وتصفية وتحليل البيانات المتاحة للعامة بشكل قانوني، بهدف دعم اتخاذ القرارات أو حل المشكلات التقنية والصحفية والتجارية.
+                                        </p>
+
+                                        <h5 className="fw-bold text-purple-glow mb-2">
+                                            <i className="fa-solid fa-filter me-2"></i>
+                                            مبدأ العمل
+                                        </h5>
+                                        <p className="text-light opacity-85 mb-3 lh-lg">
+                                            يعتمد على تحويل <strong>الضوضاء الرقمية</strong>، المتمثلة في مليارات المنشورات والصور والسجلات العامة، إلى رؤى دقيقة وقابلة للتنفيذ.
+                                        </p>
+                                    </div>
+
+                                    <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep}>
+                                        <div
+                                            className="p-3 rounded-4"
+                                            style={{
+                                                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(0, 210, 255, 0.12))',
+                                                border: '1.5px solid rgba(16, 185, 129, 0.55)'
+                                            }}
+                                        >
+                                            <div className="fw-black text-green-tech mb-1">
+                                                <i className="fa-solid fa-crown me-2"></i>
+                                                القاعدة الذهبية
+                                            </div>
+                                            <p className="mb-0 small lh-lg text-light">
+                                                المصادر المفتوحة تعني المصادر العلنية والقانونية، سواء كانت <strong>مجانية</strong> مثل محركات البحث، أو <strong>مدفوعة</strong> مثل قواعد البيانات التجارية واشتراكات الأبحاث.
+                                            </p>
+                                        </div>
+                                    </RevealBlock>
+                                </div>
+                            </RevealBlock>
+                        </div>
+
+                        <div className="col-lg-5">
+                            <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep} className="h-100" scaleOnly>
+                                <div className="glass-card p-4 h-100 d-flex flex-column justify-content-center">
+                                    <h5 className="fw-bold text-center text-electric mb-3">
+                                        من الضوضاء والبيانات إلى المعرفة
+                                    </h5>
+
+                                    <div className="p-3 rounded-3 mb-2" style={{ background: 'rgba(244, 63, 94, 0.12)', border: '1px solid rgba(244, 63, 94, 0.35)' }}>
+                                        <div className="fw-bold small text-danger"><i className="fa-solid fa-wave-square me-1"></i> 1. الضوضاء والبيانات الخام (Raw Data)</div>
+                                        <div className="small text-muted-custom">مليارات المنشورات، الصور، السجلات العامة، والصفحات غير المنظمة.</div>
+                                    </div>
+
+                                    <div className="text-center text-electric my-1">
+                                        <i className="fa-solid fa-angles-down fs-5"></i>
+                                    </div>
+
+                                    <div className="p-3 rounded-3 mb-2" style={{ background: 'rgba(59, 130, 246, 0.14)', border: '1px solid rgba(59, 130, 246, 0.4)' }}>
+                                        <div className="fw-bold small text-info"><i className="fa-solid fa-magnifying-glass-chart me-1"></i> 2. التصفية والتحقق (Filtering &amp; Verification)</div>
+                                        <div className="small text-muted-custom">استبعاد غير ذي الصلة ومطابقة الأدلة عبر مصادر مستقلة.</div>
+                                    </div>
+
+                                    <div className="text-center text-green-tech my-1">
+                                        <i className="fa-solid fa-angles-down fs-5"></i>
+                                    </div>
+
+                                    <div className="p-3 rounded-3" style={{ background: 'rgba(16, 185, 129, 0.16)', border: '1px solid rgba(16, 185, 129, 0.45)' }}>
+                                        <div className="fw-bold small text-green-tech"><i className="fa-solid fa-brain me-1"></i> 3. المعرفة والقرار (Actionable Insight)</div>
+                                        <div className="small text-muted-custom">استنتاجات دقيقة تدعم الأمن السيبراني، الصحافة، والأعمال.</div>
+                                    </div>
+                                </div>
+                            </RevealBlock>
+                        </div>
+                    </div>
+
+                    {showExample && (
+                        <div className="glass-card p-3 mt-3 border-info animate__animated animate__fadeIn">
+                            <strong className="text-electric"><i className="fa-solid fa-bolt me-1"></i> مثال توضيحي:</strong>{' '}
+                            بدلاً من قراءة آلاف التعليقات العشوائية حول خدمة ما، يجمع محلل OSINT البيانات العلنية ويصنفها ليكتشف أن 80% من الشكاوى تتركز في منطقة جغرافية أو نسخة برمجية محددة.
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 3: منهجية البحث والتحليل (5 مراحل)
+           ========================================================================== */
+        const Slide3Methodology = ({ revealStep }) => {
+            const stages = [
+                {
+                    num: 1,
+                    title: 'تحديد الهدف',
+                    icon: 'fa-bullseye',
+                    color: '#00d2ff',
+                    desc: 'صياغة السؤال البحثي بدقة.',
+                    examples: ['هل هذه الصورة حقيقية؟', 'ما المعلومات التقنية العامة المتاحة عن موقع شركتنا؟']
+                },
+                {
+                    num: 2,
+                    title: 'الجمع Collection',
+                    icon: 'fa-database',
+                    color: '#3b82f6',
+                    desc: 'استخراج البيانات الأولية من المنصات الرقمية والسجلات المتاحة للعامة.',
+                    examples: []
+                },
+                {
+                    num: 3,
+                    title: 'التصفية والتنظيم Processing',
+                    icon: 'fa-layer-group',
+                    color: '#8b5cf6',
+                    desc: 'استبعاد المعلومات المكررة أو غير ذات الصلة، وتنظيم البيانات في صورة قابلة للتحليل.',
+                    examples: []
+                },
+                {
+                    num: 4,
+                    title: 'التحليل والتحقق Analysis & Verification',
+                    icon: 'fa-shield-halved',
+                    color: '#10b981',
+                    desc: 'مطابقة البيانات من أكثر من مصدر للتأكد من صحتها واستخلاص النتائج.',
+                    examples: []
+                },
+                {
+                    num: 5,
+                    title: 'التوثيق والعرض',
+                    icon: 'fa-file-contract',
+                    color: '#f59e0b',
+                    desc: 'صياغة النتائج في تقرير واضح يدعم اتخاذ القرار.',
+                    examples: []
+                }
+            ];
+
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row">
+                            <span className="badge-osint"><i className="fa-solid fa-diagram-project"></i> مخطط انسيابي من 5 مراحل</span>
+                            <h2 className="slide-title-main gradient-heading">منهجية البحث والتحليل</h2>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-3 align-items-stretch">
+                        {stages.map((st, idx) => {
+                            const visible = revealStep >= idx + 2;
+                            return (
+                                <div key={st.num} className="col-md-6 col-xl">
+                                    <RevealBlock visible={visible} stepIndex={idx} currentStep={revealStep} className="h-100">
+                                        <div className={`pipeline-step ${visible ? 'revealed' : ''}`}>
+                                            <div className="d-flex align-items-center justify-content-between mb-2">
+                                                <span className="step-num-circle">{st.num}</span>
+                                                <i className={`fa-solid ${st.icon} fs-4`} style={{ color: st.color }}></i>
+                                            </div>
+
+                                            <h6 className="fw-black mb-1" style={{ color: st.color }}>{st.title}</h6>
+                                            <p className="small text-light opacity-90 mb-2 lh-base">{st.desc}</p>
+
+                                            {st.examples.length > 0 && (
+                                                <div className="mt-2 pt-2 border-top border-secondary border-opacity-25">
+                                                    <div className="small fw-bold text-info mb-1">أمثلة:</div>
+                                                    <ul className="list-unstyled small text-muted-custom mb-0">
+                                                        {st.examples.map((ex, i) => (
+                                                            <li key={i} className="mb-1">• {ex}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {idx < stages.length - 1 && (
+                                                <div className="d-none d-xl-block text-center mt-2 text-info opacity-50">
+                                                    <i className="fa-solid fa-arrow-left"></i>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </RevealBlock>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 4: الأقسام والتخصصات الرئيسية
+           ========================================================================== */
+        const Slide4Domains = ({ revealStep }) => {
+            const [activeDomain, setActiveDomain] = useState(null);
+
+            const domains = [
+                {
+                    id: 1,
+                    ar: 'التحليل التقني والأمن السيبراني',
+                    en: 'Technical & Cyber OSINT',
+                    icon: 'fa-shield-virus',
+                    accent: '#00d2ff',
+                    brief: 'فحص الأصول الرقمية المكشوفة، النطاقات، والخدمات المتصلة بالإنترنت لتعزيز الدفاع السيبراني.',
+                    useCase: 'مثال: حصر النطاقات الفرعية وتحديد الخدمات المكشوفة لمؤسسة مصرح بفحصها.'
+                },
+                {
+                    id: 2,
+                    ar: 'تحليل منصات التواصل الاجتماعي',
+                    en: 'Social Media Analysis',
+                    icon: 'fa-share-nodes',
+                    accent: '#8b5cf6',
+                    brief: 'دراسة التفاعلات العامة، اتجاهات الرأي، ورصد الحملات المنسقة أو الشائعات المبكرة.',
+                    useCase: 'مثال: قياس انطباع الجمهور تجاه إطلاق منتج أو خدمة جديدة.'
+                },
+                {
+                    id: 3,
+                    ar: 'التحقق الجغرافي والبصري',
+                    en: 'Geolocation & Visual Verification',
+                    icon: 'fa-map-location-dot',
+                    accent: '#10b981',
+                    brief: 'تحديد مواقع وتوقيت التقاط الصور والفيديو ومطابقة المعالم الجغرافية وكشف التزييف.',
+                    useCase: 'مثال: مطابقة مئذنة أو جسر في صورة مع خرائط الأقمار الصناعية.'
+                },
+                {
+                    id: 4,
+                    ar: 'أبحاث السوق والبيانات التجارية',
+                    en: 'Business & Market Research',
+                    icon: 'fa-chart-line',
+                    accent: '#f59e0b',
+                    brief: 'تحليل المنافسين، السجلات التجارية، وسلاسل الإمداد لدعم القرارات الاستثمارية.',
+                    useCase: 'مثال: مراجعة السجلات العلنية وبراءات الاختراع قبل عقد شراكة تجارية.'
+                },
+                {
+                    id: 5,
+                    ar: 'تتبع البصمة الرقمية',
+                    en: 'Digital Footprint Analysis',
+                    icon: 'fa-fingerprint',
+                    accent: '#ec4899',
+                    brief: 'تقييم حجم البيانات الشخصية أو المهنية الظاهرة للعلن لتقليل المخاطر وتعزيز الخصوصية.',
+                    useCase: 'مثال: فحص ما يظهر عن بريد إلكتروني أو اسم مستخدم في المصادر العلنية.'
+                }
+            ];
+
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row d-flex flex-wrap justify-content-between align-items-end gap-2">
+                            <div>
+                                <span className="badge-osint"><i className="fa-solid fa-cubes"></i> 5 تخصصات رئيسية</span>
+                                <h2 className="slide-title-main gradient-heading">أقسام OSINT الرئيسية</h2>
+                            </div>
+                            <span className="small text-muted-custom">اضغط على أي بطاقة لعرض مثال عملي</span>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-3">
+                        {domains.map((d, idx) => (
+                            <div key={d.id} className="col-sm-6 col-lg">
+                                <RevealBlock visible={revealStep >= idx + 2} stepIndex={idx} currentStep={revealStep} className="h-100">
+                                    <div
+                                        className="glass-card p-3 h-100 d-flex flex-column justify-content-between"
+                                        style={{ cursor: 'pointer', borderTop: `3px solid ${d.accent}` }}
+                                        onClick={() => setActiveDomain(activeDomain?.id === d.id ? null : d)}
+                                    >
+                                        <div>
+                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                                <span className="badge bg-dark text-info border border-info border-opacity-25">{d.id}</span>
+                                                <i className={`fa-solid ${d.icon} fs-3`} style={{ color: d.accent }}></i>
+                                            </div>
+                                            <h6 className="fw-black mb-1">{d.ar}</h6>
+                                            <div className="small fw-bold mb-2" style={{ color: d.accent }}>{d.en}</div>
+                                            <p className="small text-muted-custom mb-0 lh-base">{d.brief}</p>
+                                        </div>
+                                        <div className="small text-electric mt-2 fw-bold">
+                                            <i className="fa-solid fa-circle-plus me-1"></i> مثال عملي
+                                        </div>
+                                    </div>
+                                </RevealBlock>
+                            </div>
+                        ))}
+                    </div>
+
+                    {activeDomain && (
+                        <div className="glass-card p-3 mt-3 border-info animate__animated animate__fadeIn">
+                            <strong className="text-electric">{activeDomain.ar} ({activeDomain.en}):</strong>{' '}
+                            <span>{activeDomain.useCase}</span>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 5: التحليل التقني والأمن السيبراني (Cyber OSINT)
+           ========================================================================== */
+        const Slide5CyberOsint = ({ revealStep }) => {
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row">
+                            <span className="badge-osint"><i className="fa-solid fa-server"></i> الدفاع السيبراني وحماية الأصول</span>
+                            <h2 className="slide-title-main gradient-heading">Cyber OSINT</h2>
+                            <p className="slide-subtitle-lead">
+                                يُستخدم هذا القسم من قِبل مهندسي الأمن السيبراني ومختبري الاختراق الأخلاقي لحماية المؤسسات.
+                            </p>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-4 align-items-stretch">
+                        <div className="col-lg-4">
+                            <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep} className="h-100" scaleOnly>
+                                <div className="glass-card p-4 h-100 d-flex flex-column justify-content-center text-center">
+                                    <h6 className="fw-bold text-electric mb-2">مخطط سطح الهجوم الرقمي (Attack Surface)</h6>
+                                    <svg viewBox="0 0 280 210" className="w-100" style={{ maxHeight: '205px' }} role="img" aria-label="رسم توضيحي لسطح الهجوم وحماية الأصول">
+                                        <circle cx="140" cy="105" r="85" fill="rgba(0,210,255,0.07)" stroke="#00d2ff" strokeWidth="1.5" strokeDasharray="5 4" />
+                                        <circle cx="140" cy="105" r="54" fill="rgba(16,185,129,0.12)" stroke="#10b981" strokeWidth="2" />
+                                        <circle cx="140" cy="105" r="27" fill="#0c1936" stroke="#a78bfa" strokeWidth="2.5" />
+                                        <text x="140" y="103" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="800">الأصول</text>
+                                        <text x="140" y="116" textAnchor="middle" fill="#c4b5fd" fontSize="9" fontWeight="700">الرقمية</text>
+                                        <text x="140" y="34" textAnchor="middle" fill="#00d2ff" fontSize="10" fontWeight="700">نطاقات وخوادم مكشوفة</text>
+                                        <text x="140" y="185" textAnchor="middle" fill="#34d399" fontSize="10" fontWeight="700">مراقبة وتحصين دفاعي</text>
+                                    </svg>
+                                    <div className="badge-green mt-2 mx-auto">
+                                        <i className="fa-solid fa-shield-check me-1"></i>
+                                        الهدف: حماية الأنظمة وليس اختراقها
+                                    </div>
+                                </div>
+                            </RevealBlock>
+                        </div>
+
+                        <div className="col-lg-8">
+                            <div className="d-flex flex-column gap-3 h-100 justify-content-between">
+                                <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                            <i className="fa-solid fa-network-wired text-electric fs-5"></i>
+                                            <h5 className="fw-bold mb-0 text-electric">اكتشاف سطح الهجوم — Attack Surface Discovery</h5>
+                                        </div>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            حصر النطاقات الفرعية والخوادم وعناوين IP التابعة للشركة والمكشوفة للعامة، بهدف فهم الأصول الرقمية وتحسين حمايتها.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                            <i className="fa-solid fa-video text-purple-glow fs-5"></i>
+                                            <h5 className="fw-bold mb-0 text-purple-glow">فحص الأجهزة المتصلة — IoT Scanning</h5>
+                                        </div>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            البحث عن الأنظمة أو الكاميرات أو قواعد البيانات التي قد تكون متصلة بالإنترنت دون حماية كافية، باستخدام محركات بحث متخصصة مثل <strong>Shodan</strong>، ضمن نطاق مصرح به.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 5} stepIndex={4} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                            <i className="fa-solid fa-triangle-exclamation text-warning fs-5"></i>
+                                            <h5 className="fw-bold mb-0 text-warning">رصد تسريبات البيانات</h5>
+                                        </div>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            التحقق من وجود بيانات مؤسسية مكشوفة في مصادر قانونية متاحة، واتخاذ إجراءات حماية مثل تغيير كلمات المرور وإبطال بيانات الدخول المتأثرة.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 6: التحقق الجغرافي والبصري (Geolocation & Visual Verification)
+           ========================================================================== */
+        const Slide6GeoVerification = ({ revealStep }) => {
+            const [showCaseStudy, setShowCaseStudy] = useState(false);
+
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row d-flex flex-wrap justify-content-between align-items-end gap-2">
+                            <div>
+                                <span className="badge-green"><i className="fa-solid fa-location-crosshairs"></i> الصحافة الاستقصائية وتقصي الحقائق</span>
+                                <h2 className="slide-title-main gradient-heading">Geolocation &amp; Visual Verification</h2>
+                                <p className="slide-subtitle-lead">
+                                    يُعد التحقق الجغرافي والبصري من الأدوات المهمة في الصحافة الاستقصائية وتقصي الحقائق.
+                                </p>
+                            </div>
+                            <button
+                                className="btn btn-sm btn-outline-info rounded-pill px-3 fw-bold"
+                                onClick={() => setShowCaseStudy(!showCaseStudy)}
+                            >
+                                <i className="fa-solid fa-map-pin me-1"></i>
+                                {showCaseStudy ? 'إخفاء المثال التعليمي' : 'مثال تعليمي: ساحة عامة ومقارنة الصور'}
+                            </button>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-4 align-items-stretch">
+                        <div className="col-lg-7">
+                            <div className="d-flex flex-column gap-3 h-100 justify-content-between">
+                                <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h5 className="fw-bold text-electric mb-1">
+                                            <i className="fa-solid fa-earth-americas me-2"></i>
+                                            تحديد الموقع الجغرافي — Geolocation
+                                        </h5>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            مطابقة المعالم الظاهرة في صورة أو فيديو، مثل المباني والجبال واللافتات، مع صور الأقمار الصناعية والخرائط لتحديد مكان التصوير.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h5 className="fw-bold text-purple-glow mb-1">
+                                            <i className="fa-solid fa-sun me-2"></i>
+                                            تحديد التوقيت — Chronolocation
+                                        </h5>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            تحليل طول الظلال واتجاهها وحالة الطقس والظروف المحيطة لتقدير وقت التقاط الصورة.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h5 className="fw-bold text-green-tech mb-1">
+                                            <i className="fa-solid fa-images me-2"></i>
+                                            كشف التزييف
+                                        </h5>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            استخدام البحث العكسي عن الصور لمعرفة ما إذا كانت الصورة قديمة أو أعيد نشرها في سياق مضلل.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-5">
+                            <RevealBlock visible={revealStep >= 5} stepIndex={4} currentStep={revealStep} className="h-100" scaleOnly>
+                                <div className="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <h6 className="fw-bold text-center text-electric mb-2">مطابقة المعالم والخرائط الفضائية</h6>
+                                        <svg viewBox="0 0 320 150" className="w-100 rounded-3" style={{ background: 'rgba(6,13,29,0.85)', border: '1px solid rgba(0,210,255,0.2)' }} role="img" aria-label="رسم مطابقة المعالم مع الخريطة">
+                                            <line x1="0" y1="48" x2="320" y2="48" stroke="rgba(0,210,255,0.14)" />
+                                            <line x1="0" y1="100" x2="320" y2="100" stroke="rgba(0,210,255,0.14)" />
+                                            <line x1="110" y1="0" x2="110" y2="150" stroke="rgba(0,210,255,0.14)" />
+                                            <line x1="215" y1="0" x2="215" y2="150" stroke="rgba(0,210,255,0.14)" />
+                                            <rect x="42" y="52" width="38" height="52" rx="4" fill="rgba(59,130,246,0.35)" stroke="#60a5fa" />
+                                            <polygon points="150,32 130,104 170,104" fill="rgba(16,185,129,0.28)" stroke="#34d399" />
+                                            <circle cx="255" cy="72" r="9" fill="none" stroke="#00d2ff" strokeWidth="2.5" />
+                                            <circle cx="255" cy="72" r="3.5" fill="#00d2ff" />
+                                            <line x1="80" y1="76" x2="245" y2="72" stroke="#00d2ff" strokeDasharray="4 3" />
+                                            <text x="160" y="134" textAnchor="middle" fill="#cbd5e1" fontSize="10" fontWeight="700">مقارنة المباني والظلال والخطوط الجغرافية</text>
+                                        </svg>
+                                    </div>
+
+                                    <div className="row g-2 mt-2 text-center small">
+                                        <div className="col-6">
+                                            <div className="p-2 rounded-3" style={{ background: 'rgba(16,185,129,0.14)', border: '1px solid rgba(16,185,129,0.35)' }}>
+                                                <div className="fw-bold text-green-tech"><i className="fa-solid fa-check-circle me-1"></i> صورة أصلية مطابقة</div>
+                                                <div className="text-muted-custom">الظلال واللافتات متطابقة مع السياق</div>
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="p-2 rounded-3" style={{ background: 'rgba(244,63,94,0.14)', border: '1px solid rgba(244,63,94,0.35)' }}>
+                                                <div className="fw-bold text-danger"><i className="fa-solid fa-circle-xmark me-1"></i> إعادة استخدام مضللة</div>
+                                                <div className="text-muted-custom">صورة قديمة نُشرت بحدث حديث</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </RevealBlock>
+                        </div>
+                    </div>
+
+                    {showCaseStudy && (
+                        <div className="glass-card p-3 mt-3 border-info animate__animated animate__fadeIn">
+                            <strong className="text-electric"><i className="fa-solid fa-landmark me-1"></i> مثال تعليمي (ساحة عامة مشهورة):</strong>{' '}
+                            عند نشر صورة يُدّعى أنها التُقطت مساءً في ساحة عامة، يمكن التحقق من موقع الأعمدة والنافورة على الخريطة، ثم مقارنة طول ظلّها وزاويته بزاوية الشمس في ذلك التاريخ والساعة للتأكد من صحة الادعاء.
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 7: أبحاث السوق والبيانات التجارية (Business OSINT)
+           ========================================================================== */
+        const Slide7BusinessOsint = ({ revealStep }) => {
+            const comparisonChartData = {
+                labels: ['حصة السوق (%)', 'نمو الإيرادات (%)', 'الانتشار الإقليمي', 'براءات الاختراع'],
+                datasets: [
+                    {
+                        label: 'شركة ألفا التقنية (افتراضية)',
+                        data: [64, 78, 82, 70],
+                        backgroundColor: 'rgba(0, 210, 255, 0.72)',
+                        borderColor: '#00d2ff',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'شركة بيتا الرقمية (افتراضية)',
+                        data: [52, 65, 68, 55],
+                        backgroundColor: 'rgba(139, 92, 246, 0.72)',
+                        borderColor: '#a78bfa',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }
+                ]
+            };
+
+            const comparisonChartOptions = {
+                scales: {
+                    x: { ticks: { color: '#cbd5e1', font: { family: 'Cairo', size: 11 } }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                    y: { beginAtZero: true, max: 100, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.08)' } }
+                }
+            };
+
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row">
+                            <span className="badge-osint"><i className="fa-solid fa-briefcase"></i> ذكاء الأعمال والقرارات الاستثمارية</span>
+                            <h2 className="slide-title-main gradient-heading">Business OSINT</h2>
+                            <p className="slide-subtitle-lead">
+                                تعتمد الشركات والمستثمرون على هذا النوع من التحليل لاتخاذ قرارات مالية وتسويقية مدروسة.
+                            </p>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-4 align-items-stretch">
+                        <div className="col-lg-6">
+                            <div className="d-flex flex-column gap-3 h-100 justify-content-between">
+                                <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h6 className="fw-bold text-electric mb-1">
+                                            <i className="fa-solid fa-chess me-2"></i>
+                                            تحليل المنافسين — Competitive Intelligence
+                                        </h6>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            دراسة استراتيجيات التسعير والمنتجات الجديدة والتوسع الجغرافي للمنافسين عبر مواقعهم وإعلاناتهم وتقاريرهم السنوية.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h6 className="fw-bold text-purple-glow mb-1">
+                                            <i className="fa-solid fa-scale-balanced me-2"></i>
+                                            العناية الواجبة — Due Diligence
+                                        </h6>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            فحص السجلات التجارية وبراءات الاختراع والدعاوى القضائية المتاحة للعامة قبل الدخول في شراكة أو صفقة استحواذ.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h6 className="fw-bold text-green-tech mb-1">
+                                            <i className="fa-solid fa-ship me-2"></i>
+                                            تحليل سلاسل الإمداد
+                                        </h6>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            دراسة حركة الشحن البحري والجوي وسجلات الجمارك العامة لفهم مصادر المواد الخام وسلاسل التوريد.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-6">
+                            <RevealBlock visible={revealStep >= 5} stepIndex={4} currentStep={revealStep} className="h-100" scaleOnly>
+                                <div className="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                                    <h6 className="fw-bold text-center text-electric mb-2">
+                                        لوحة مقارنة تجارية (بيانات افتراضية توضيحية)
+                                    </h6>
+                                    <OsintChart type="bar" data={comparisonChartData} options={comparisonChartOptions} height="205px" />
+
+                                    <div className="mt-3 pt-2 border-top border-secondary border-opacity-25 small d-flex flex-wrap justify-content-around text-center gap-2">
+                                        <span className="badge-osint"><i className="fa-solid fa-industry"></i> مصدر المواد الخام</span>
+                                        <i className="fa-solid fa-arrow-left text-info align-self-center"></i>
+                                        <span className="badge-purple"><i className="fa-solid fa-truck-fast"></i> الشحن والجمارك</span>
+                                        <i className="fa-solid fa-arrow-left text-info align-self-center"></i>
+                                        <span className="badge-green"><i className="fa-solid fa-store"></i> السوق والمستهلك</span>
+                                    </div>
+                                </div>
+                            </RevealBlock>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 8: تحليل منصات التواصل الاجتماعي (Social Media OSINT)
+           ========================================================================== */
+        const Slide8SocialOsint = ({ revealStep }) => {
+            const sentimentData = {
+                labels: ['إيجابي', 'محايد', 'سلبي'],
+                datasets: [
+                    {
+                        data: [58, 26, 16],
+                        backgroundColor: ['#10b981', '#00d2ff', '#f43f5e'],
+                        borderColor: '#091024',
+                        borderWidth: 2
+                    }
+                ]
+            };
+
+            const sentimentOptions = {
+                cutout: '62%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#e2e8f0', font: { family: 'Cairo', size: 12 } }
+                    }
+                }
+            };
+
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row">
+                            <span className="badge-purple"><i className="fa-solid fa-users-viewfinder"></i> التسويق وإدارة الأزمات</span>
+                            <h2 className="slide-title-main gradient-heading">Social Media OSINT</h2>
+                            <p className="slide-subtitle-lead">
+                                يُستخدم في التسويق الرقمي وإدارة الأزمات والأبحاث الاجتماعية.
+                            </p>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-4 align-items-stretch">
+                        <div className="col-lg-7">
+                            <div className="d-flex flex-column gap-3 h-100 justify-content-between">
+                                <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h5 className="fw-bold text-green-tech mb-1">
+                                            <i className="fa-solid fa-face-smile me-2"></i>
+                                            تحليل توجهات الجمهور — Sentiment Analysis
+                                        </h5>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            قياس ردود أفعال المستهلكين تجاه منتج أو حملة إعلانية.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h5 className="fw-bold text-electric mb-1">
+                                            <i className="fa-solid fa-bullhorn me-2"></i>
+                                            إدارة السمعة والأزمات
+                                        </h5>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            الرصد المبكر للشائعات التي تستهدف العلامة التجارية والرد عليها قبل انتشارها.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep}>
+                                    <div className="glass-card p-3">
+                                        <h5 className="fw-bold text-purple-glow mb-1">
+                                            <i className="fa-solid fa-user-secret me-2"></i>
+                                            اكتشاف الحسابات الوهمية
+                                        </h5>
+                                        <p className="small text-light opacity-90 mb-0 lh-lg">
+                                            تحليل أنماط النشر والتفاعل للكشف عن الشبكات المنسقة التي تروج لمحتوى مزيف أو تقييمات وهمية.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-5">
+                            <RevealBlock visible={revealStep >= 5} stepIndex={4} currentStep={revealStep} className="h-100" scaleOnly>
+                                <div className="glass-card p-4 h-100 d-flex flex-column justify-content-center align-items-center">
+                                    <h6 className="fw-bold text-electric mb-3 text-center">
+                                        توزيع توجهات الجمهور (نموذج توضيحي)
+                                    </h6>
+                                    <OsintChart type="doughnut" data={sentimentData} options={sentimentOptions} height="225px" />
+                                    <p className="small text-muted-custom text-center mt-2 mb-0">
+                                        رصد التفاعل العام يساعد فرق التواصل على استباق الأزمات وتحسين تجربة الجمهور.
+                                    </p>
+                                </div>
+                            </RevealBlock>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 9: تتبع البصمة الرقمية (Digital Footprint Analysis)
+           ========================================================================== */
+        const Slide9DigitalFootprint = ({ revealStep }) => {
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row">
+                            <span className="badge-osint"><i className="fa-solid fa-user-shield"></i> الخصوصية والتحقق المهني</span>
+                            <h2 className="slide-title-main gradient-heading">Digital Footprint Analysis</h2>
+                            <p className="slide-subtitle-lead">
+                                يُستخدم في حماية الخصوصية الشخصية والتوظيف والبحث الأكاديمي.
+                            </p>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-4 align-items-stretch">
+                        <div className="col-lg-6">
+                            <div className="d-flex flex-column gap-3 h-100 justify-content-between">
+                                <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep}>
+                                    <div className="glass-card p-4">
+                                        <h5 className="fw-bold text-electric mb-2">
+                                            <i className="fa-solid fa-lock me-2"></i>
+                                            حماية الخصوصية الشخصية
+                                        </h5>
+                                        <p className="text-light opacity-90 mb-0 lh-lg">
+                                            فحص البيانات الشخصية المتاحة للعامة، مثل البريد الإلكتروني أو اسم المستخدم، لمعرفة حجم المعلومات المكشوفة وتقليصها.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+
+                                <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep}>
+                                    <div className="glass-card p-4">
+                                        <h5 className="fw-bold text-purple-glow mb-2">
+                                            <i className="fa-solid fa-id-card me-2"></i>
+                                            التحقق من الهوية المهنية
+                                        </h5>
+                                        <p className="text-light opacity-90 mb-0 lh-lg">
+                                            التأكد من صحة الشهادات والخبرات المذكورة في السير الذاتية للمتقدمين للوظائف عبر المنصات المهنية والأكاديمية.
+                                        </p>
+                                    </div>
+                                </RevealBlock>
+                            </div>
+                        </div>
+
+                        <div className="col-lg-6">
+                            <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep} className="h-100" scaleOnly>
+                                <div className="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                                    <h6 className="fw-bold text-electric mb-3">
+                                        <i className="fa-solid fa-fingerprint me-2"></i>
+                                        المعلومات التي قد يتركها المستخدم عبر الإنترنت
+                                    </h6>
+
+                                    <div className="row g-2 mb-3">
+                                        <div className="col-6">
+                                            <div className="p-3 rounded-3 h-100" style={{ background: 'rgba(0,210,255,0.09)', border: '1px solid rgba(0,210,255,0.28)' }}>
+                                                <div className="fw-bold small text-electric">أسماء المستخدمين المتكررة</div>
+                                                <div className="small text-muted-custom">ربط الحسابات العامة عبر منصات متعددة</div>
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="p-3 rounded-3 h-100" style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.3)' }}>
+                                                <div className="fw-bold small text-purple-glow">المنشورات والملفات العامة</div>
+                                                <div className="small text-muted-custom">بيانات وصفية وصور منشورة للعامة</div>
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="p-3 rounded-3 h-100" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)' }}>
+                                                <div className="fw-bold small text-warning">البريد الإلكتروني العام</div>
+                                                <div className="small text-muted-custom">ظهوره في منتديات أو سجلات مفتوحة</div>
+                                            </div>
+                                        </div>
+                                        <div className="col-6">
+                                            <div className="p-3 rounded-3 h-100" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)' }}>
+                                                <div className="fw-bold small text-green-tech">السجل الأكاديمي والمهني</div>
+                                                <div className="small text-muted-custom">الأوراق المنشورة والملفات المهنية المعلنة</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-3 rounded-3 text-center fw-bold small text-green-tech" style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)' }}>
+                                        <i className="fa-solid fa-shield-heart me-1"></i>
+                                        تقليل المعلومات الشخصية المكشوفة يحمي الخصوصية ويحد من مخاطر الهندسة الاجتماعية.
+                                    </div>
+                                </div>
+                            </RevealBlock>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 10: تطبيقات عملية في الحياة اليومية
+           ========================================================================== */
+        const Slide10DailyLife = ({ revealStep }) => {
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row">
+                            <span className="badge-green"><i className="fa-solid fa-globe"></i> أثر مدني وعلمي ملموس</span>
+                            <h2 className="slide-title-main gradient-heading">OSINT في الحياة اليومية</h2>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-4 mb-3">
+                        <div className="col-md-4">
+                            <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep} className="h-100">
+                                <div className="glass-card p-4 h-100" style={{ borderTop: '3px solid #00d2ff' }}>
+                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                        <i className="fa-solid fa-newspaper fs-3 text-electric"></i>
+                                        <h5 className="fw-black mb-0">في الصحافة</h5>
+                                    </div>
+                                    <p className="small text-light opacity-90 lh-lg mb-0">
+                                        كشف الأخبار الكاذبة وتوثيق الأحداث الميدانية والبيئية، مثل رصد إزالة الغابات أو التلوث عبر صور الأقمار الصناعية.
+                                    </p>
+                                </div>
+                            </RevealBlock>
+                        </div>
+
+                        <div className="col-md-4">
+                            <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep} className="h-100">
+                                <div className="glass-card p-4 h-100" style={{ borderTop: '3px solid #f59e0b' }}>
+                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                        <i className="fa-solid fa-house-crack fs-3 text-warning"></i>
+                                        <h5 className="fw-black mb-0">في إدارة الكوارث</h5>
+                                    </div>
+                                    <p className="small text-light opacity-90 lh-lg mb-0">
+                                        استخدام خرائط البيانات المفتوحة ومعلومات السكان لتحديد المناطق الأكثر تضررًا أثناء الزلازل والفيضانات، وتوجيه فرق الإغاثة.
+                                    </p>
+                                </div>
+                            </RevealBlock>
+                        </div>
+
+                        <div className="col-md-4">
+                            <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep} className="h-100">
+                                <div className="glass-card p-4 h-100" style={{ borderTop: '3px solid #8b5cf6' }}>
+                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                        <i className="fa-solid fa-microscope fs-3 text-purple-glow"></i>
+                                        <h5 className="fw-black mb-0">في التعليم والبحث العلمي</h5>
+                                    </div>
+                                    <p className="small text-light opacity-90 lh-lg mb-0">
+                                        جمع البيانات المفتوحة لدراسة الظواهر الاقتصادية والاجتماعية.
+                                    </p>
+                                </div>
+                            </RevealBlock>
+                        </div>
+                    </div>
+
+                    <RevealBlock visible={revealStep >= 5} stepIndex={4} currentStep={revealStep}>
+                        <div className="glass-card p-3">
+                            <div className="row align-items-center g-2 text-center">
+                                <div className="col-md-3">
+                                    <div className="p-2 rounded-3 bg-dark border border-info border-opacity-25 small fw-bold text-electric">
+                                        بيانات مفتوحة وخرائط وصور
+                                    </div>
+                                </div>
+                                <div className="col-md-1 text-info"><i className="fa-solid fa-arrow-left"></i></div>
+                                <div className="col-md-4">
+                                    <div className="p-2 rounded-3 bg-dark border border-secondary border-opacity-25 small fw-bold text-purple-glow">
+                                        ربط المؤشرات والتحقق من صحتها
+                                    </div>
+                                </div>
+                                <div className="col-md-1 text-info"><i className="fa-solid fa-arrow-left"></i></div>
+                                <div className="col-md-3">
+                                    <div className="p-2 rounded-3 bg-dark border border-success border-opacity-40 small fw-bold text-green-tech">
+                                        استجابة أسرع وقرار مدروس
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </RevealBlock>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 11: التحديات والضوابط الأخلاقية والقانونية
+           ========================================================================== */
+        const Slide11EthicsLaw = ({ revealStep }) => {
+            return (
+                <div className="py-1">
+                    <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                        <div className="slide-header-row">
+                            <span className="badge-osint"><i className="fa-solid fa-gavel"></i> المسؤولية القانونية والمنهجية</span>
+                            <h2 className="slide-title-main gradient-heading">الضوابط الأخلاقية والقانونية</h2>
+                        </div>
+                    </RevealBlock>
+
+                    <div className="row g-4 mb-3">
+                        <div className="col-md-4">
+                            <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep} className="h-100">
+                                <div className="glass-card p-4 h-100" style={{ borderTop: '3px solid #f43f5e' }}>
+                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                        <i className="fa-solid fa-scale-balanced fs-3 text-danger"></i>
+                                        <h5 className="fw-black mb-0">الالتزام بالقانون</h5>
+                                    </div>
+                                    <p className="small text-light opacity-90 lh-lg mb-0">
+                                        يقتصر OSINT على البيانات المتاحة للعامة أو التي تم الحصول عليها بإذن قانوني. تجاوز كلمات المرور أو اختراق الأنظمة ليس من OSINT ويُعد سلوكًا غير قانوني.
+                                    </p>
+                                </div>
+                            </RevealBlock>
+                        </div>
+
+                        <div className="col-md-4">
+                            <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep} className="h-100">
+                                <div className="glass-card p-4 h-100" style={{ borderTop: '3px solid #00d2ff' }}>
+                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                        <i className="fa-solid fa-magnifying-glass-check fs-3 text-electric"></i>
+                                        <h5 className="fw-black mb-0">التحقق من دقة البيانات</h5>
+                                    </div>
+                                    <p className="small text-light opacity-90 lh-lg mb-0">
+                                        وفرة المعلومات لا تعني صحتها، لذلك يجب الرجوع إلى المصدر الأساسي والتحقق من المعلومات من مصادر مستقلة وتجنب التحيز.
+                                    </p>
+                                </div>
+                            </RevealBlock>
+                        </div>
+
+                        <div className="col-md-4">
+                            <RevealBlock visible={revealStep >= 4} stepIndex={3} currentStep={revealStep} className="h-100">
+                                <div className="glass-card p-4 h-100" style={{ borderTop: '3px solid #10b981' }}>
+                                    <div className="d-flex align-items-center gap-2 mb-3">
+                                        <i className="fa-solid fa-user-lock fs-3 text-green-tech"></i>
+                                        <h5 className="fw-black mb-0">حماية خصوصية الباحث</h5>
+                                    </div>
+                                    <p className="small text-light opacity-90 lh-lg mb-0">
+                                        استخدام بيئات عمل آمنة ومتصفحات مناسبة لحماية بيانات الباحث الشخصية أثناء البحث.
+                                    </p>
+                                </div>
+                            </RevealBlock>
+                        </div>
+                    </div>
+
+                    <RevealBlock visible={revealStep >= 5} stepIndex={4} currentStep={revealStep} scaleOnly>
+                        <div
+                            className="p-3 p-md-4 rounded-4 text-center"
+                            style={{
+                                background: 'linear-gradient(135deg, rgba(0, 210, 255, 0.14), rgba(139, 92, 246, 0.16))',
+                                border: '1.5px solid rgba(0, 210, 255, 0.45)'
+                            }}
+                        >
+                            <div className="h4 fw-black mb-0 text-white">
+                                <i className="fa-solid fa-shield-exclamation text-electric me-2"></i>
+                                "المعلومة المفتوحة لا تعني الاستخدام غير المسؤول"
+                            </div>
+                        </div>
+                    </RevealBlock>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide 12: الخاتمة
+           ========================================================================== */
+        const Slide12Conclusion = ({ revealStep, presenterName }) => {
+            return (
+                <div className="py-1 text-center">
+                    <div className="glass-card p-4 p-md-5 mx-auto" style={{ maxWidth: '980px' }}>
+                        <RevealBlock visible={revealStep >= 1} stepIndex={0} currentStep={revealStep}>
+                            <span className="badge-osint mb-2">
+                                <i className="fa-solid fa-flag-checkered"></i> خاتمة العرض التقديمي
+                            </span>
+                            <h2 className="slide-title-main gradient-heading mb-2">
+                                المعرفة تبدأ من البيانات
+                            </h2>
+                            <p className="fs-6 text-light opacity-90 mb-2 lh-lg">
+                                أصبحت تقنيات OSINT مهارة أساسية في العصر الرقمي لكل باحث وصحفي ومهندس أمن سيبراني ومحلل أعمال.
+                            </p>
+                            <p className="fs-6 text-info fw-semibold mb-3 lh-lg">
+                                القيمة الحقيقية ليست في امتلاك المعلومة، بل في القدرة على التحقق منها وربطها ببعضها بشكل منطقي.
+                            </p>
+                        </RevealBlock>
+
+                        <RevealBlock visible={revealStep >= 2} stepIndex={1} currentStep={revealStep} scaleOnly>
+                            <div
+                                className="p-3 p-md-4 rounded-4 mb-3"
+                                style={{
+                                    background: 'rgba(0, 210, 255, 0.09)',
+                                    border: '1px solid rgba(0, 210, 255, 0.35)'
+                                }}
+                            >
+                                <div className="h3 fw-black text-white mb-0 lh-base">
+                                    "ليست قوة الباحث في كمية البيانات التي يجمعها، بل في دقة ما يستنتجه منها."
+                                </div>
+                            </div>
+                        </RevealBlock>
+
+                        <RevealBlock visible={revealStep >= 3} stepIndex={2} currentStep={revealStep}>
+                            <div className="d-flex flex-wrap justify-content-center align-items-center gap-3 mb-3 small fw-bold">
+                                <span className="badge-osint px-3 py-2"><i className="fa-solid fa-database"></i> بيانات مفتوحة</span>
+                                <i className="fa-solid fa-arrow-left text-electric"></i>
+                                <span className="badge-purple px-3 py-2"><i className="fa-solid fa-check-double"></i> تحقق وربط منطقي</span>
+                                <i className="fa-solid fa-arrow-left text-electric"></i>
+                                <span className="badge-green px-3 py-2"><i className="fa-solid fa-lightbulb"></i> معرفة دقيقة</span>
+                            </div>
+
+                            <div className="pt-3 border-top border-secondary border-opacity-25">
+                                <div className="h4 fw-black text-electric mb-1">شكرًا لحسن استماعكم</div>
+                                <div className="text-muted-custom small">
+                                    مقدم العرض: <strong className="text-light">{presenterName || 'يزن بلال البعبوع'}</strong>
+                                </div>
+                            </div>
+                        </RevealBlock>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Speaker Notes Floating Panel Component
+           ========================================================================== */
+        const SpeakerNotesPanel = ({ isOpen, onClose, currentSlide }) => {
+            if (!isOpen) return null;
+            const note = SPEAKER_NOTES_DATA[currentSlide] || SPEAKER_NOTES_DATA[1];
+
+            return (
+                <div className="speaker-notes-panel" role="dialog" aria-label="ملاحظات المحاضر">
+                    <div className="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom border-secondary border-opacity-25">
+                        <div>
+                            <span className="badge-purple small">شريحة {currentSlide} من {TOTAL_SLIDES}</span>
+                            <h6 className="fw-black text-electric mt-1 mb-0">{note.slideTitle}</h6>
+                        </div>
+                        <button className="btn btn-sm btn-outline-light rounded-circle" onClick={onClose} aria-label="إغلاق ملاحظات المحاضر">
+                            <i className="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div className="mb-2">
+                        <div className="small fw-bold text-info"><i className="fa-solid fa-comment-dots me-1"></i> مقدمة قصيرة يشرحها المحاضر:</div>
+                        <p className="small text-light opacity-90 mb-0 lh-base">{note.intro}</p>
+                    </div>
+
+                    <div className="mb-2">
+                        <div className="small fw-bold text-purple-glow"><i className="fa-solid fa-layer-group me-1"></i> شرح إضافي للنقاط الرئيسية:</div>
+                        <p className="small text-light opacity-90 mb-0 lh-base">{note.explanation}</p>
+                    </div>
+
+                    <div className="mb-2">
+                        <div className="small fw-bold text-green-tech"><i className="fa-solid fa-flask me-1"></i> مثال عملي للإلقاء:</div>
+                        <p className="small text-light opacity-90 mb-0 lh-base">{note.example}</p>
+                    </div>
+
+                    <div className="mb-2">
+                        <div className="small fw-bold text-warning"><i className="fa-solid fa-circle-question me-1"></i> سؤال تفاعلي للجمهور:</div>
+                        <p className="small text-light opacity-90 mb-0 lh-base">{note.question}</p>
+                    </div>
+
+                    <div className="p-2 rounded-3 mt-2" style={{ background: 'rgba(0, 210, 255, 0.08)', border: '1px solid rgba(0, 210, 255, 0.25)' }}>
+                        <div className="small fw-bold text-electric"><i className="fa-solid fa-arrow-turn-left me-1"></i> جملة انتقالية للشريحة التالية:</div>
+                        <div className="small text-light lh-base">{note.transition}</div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Presenter View Overlay Component (Current Slide, Next Preview, Notes, Timer, Clock)
+           ========================================================================== */
+        const PresenterViewOverlay = ({
+            isOpen,
+            onClose,
+            currentSlide,
+            goNext,
+            goPrev,
+            elapsedSeconds,
+            nowClockStr,
+            renderSlideContent,
+            transitionMode,
+            setTransitionMode
+        }) => {
+            if (!isOpen) return null;
+
+            const note = SPEAKER_NOTES_DATA[currentSlide] || SPEAKER_NOTES_DATA[1];
+            const nextSlideNum = currentSlide < TOTAL_SLIDES ? currentSlide + 1 : null;
+            const nextSlideMeta = nextSlideNum ? SLIDE_INDEX_TITLES[nextSlideNum - 1] : null;
+
+            const formatElapsed = (sec) => {
+                const hrs = String(Math.floor(sec / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+                const secs = String(sec % 60).padStart(2, '0');
+                return `${hrs}:${mins}:${secs}`;
+            };
+
+            return (
+                <div className="presenter-view-overlay" role="dialog" aria-label="وضع مقدم العرض Presenter View">
+                    {/* Top Presenter Header */}
+                    <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 pb-3 mb-3 border-bottom border-secondary border-opacity-25">
+                        <div className="d-flex align-items-center gap-2">
+                            <span className="badge-osint">
+                                <i className="fa-solid fa-chalkboard-user"></i> Presenter View — واجهة المحاضر
+                            </span>
+                            <span className="slide-counter-pill">
+                                الشريحة {currentSlide} / {TOTAL_SLIDES}
+                            </span>
+                        </div>
+
+                        <div className="d-flex flex-wrap align-items-center gap-3">
+                            <div className="small fw-bold text-green-tech">
+                                <i className="fa-solid fa-stopwatch me-1"></i>
+                                الوقت المنقضي: <span dir="ltr">{formatElapsed(elapsedSeconds)}</span>
+                            </div>
+                            <div className="small fw-bold text-electric">
+                                <i className="fa-regular fa-clock me-1"></i>
+                                الساعة: <span dir="ltr">{nowClockStr}</span>
+                            </div>
+                            <select
+                                className="form-select form-select-sm bg-dark text-light border-info border-opacity-50"
+                                style={{ width: 'auto' }}
+                                value={transitionMode}
+                                onChange={(e) => setTransitionMode(e.target.value)}
+                                aria-label="اختيار نوع الانتقال السينمائي"
+                            >
+                                {TRANSITION_MODES.map((m) => (
+                                    <option key={m.id} value={m.id}>{m.label}</option>
+                                ))}
+                            </select>
+                            <button className="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" onClick={onClose}>
+                                <i className="fa-solid fa-xmark me-1"></i> إغلاق وضع المحاضر
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Main Presenter Grid */}
+                    <div className="row g-3">
+                        {/* Left: Current Slide & Next Slide Preview */}
+                        <div className="col-lg-7 d-flex flex-column gap-3">
+                            <div className="glass-card p-3">
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <span className="small fw-bold text-electric">
+                                        <i className="fa-solid fa-desktop me-1"></i> الشريحة الحالية (رقم {currentSlide})
+                                    </span>
+                                    <div className="d-flex gap-2">
+                                        <button className="btn btn-sm btn-outline-info" onClick={goPrev} disabled={currentSlide === 1}>
+                                            <i className="fa-solid fa-chevron-right me-1"></i> السابق
+                                        </button>
+                                        <button className="btn btn-sm btn-info text-dark fw-bold" onClick={goNext} disabled={currentSlide === TOTAL_SLIDES}>
+                                            التالي <i className="fa-solid fa-chevron-left ms-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div
+                                    className="rounded-3 p-2 overflow-auto"
+                                    style={{
+                                        maxHeight: '360px',
+                                        background: '#050811',
+                                        border: '1px solid rgba(0,210,255,0.22)'
+                                    }}
+                                >
+                                    <div style={{ transform: 'scale(0.76)', transformOrigin: 'top right', width: '131%' }}>
+                                        {renderSlideContent(currentSlide, 99)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Next Slide Preview */}
+                            <div className="glass-card p-3">
+                                <div className="small fw-bold text-purple-glow mb-2">
+                                    <i className="fa-solid fa-forward-step me-1"></i> معاينة الشريحة التالية
+                                </div>
+                                {nextSlideMeta ? (
+                                    <div className="d-flex justify-content-between align-items-center p-2 rounded-3 bg-dark border border-secondary border-opacity-25">
+                                        <div>
+                                            <span className="badge-purple me-2">شريحة {nextSlideMeta.num}</span>
+                                            <strong className="text-light">{nextSlideMeta.title}</strong>
+                                        </div>
+                                        <span className="small text-muted-custom">{nextSlideMeta.tag}</span>
+                                    </div>
+                                ) : (
+                                    <div className="small text-muted-custom">هذه هي الشريحة الأخيرة في العرض التقديمي.</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Right: Detailed Speaker Notes */}
+                        <div className="col-lg-5">
+                            <div className="glass-card p-4 h-100 overflow-auto" style={{ maxHeight: '535px' }}>
+                                <h5 className="fw-black text-electric mb-3">
+                                    <i className="fa-solid fa-book-open me-2"></i>
+                                    ملاحظات المحاضر — {note.slideTitle}
+                                </h5>
+
+                                <div className="mb-3">
+                                    <div className="small fw-bold text-info mb-1">مقدمة قصيرة يشرحها المحاضر:</div>
+                                    <p className="small text-light opacity-90 mb-0 lh-lg">{note.intro}</p>
+                                </div>
+
+                                <div className="mb-3">
+                                    <div className="small fw-bold text-purple-glow mb-1">شرح إضافي للنقاط الرئيسية:</div>
+                                    <p className="small text-light opacity-90 mb-0 lh-lg">{note.explanation}</p>
+                                </div>
+
+                                <div className="mb-3">
+                                    <div className="small fw-bold text-green-tech mb-1">مثال عملي أثناء العرض:</div>
+                                    <p className="small text-light opacity-90 mb-0 lh-lg">{note.example}</p>
+                                </div>
+
+                                <div className="mb-3">
+                                    <div className="small fw-bold text-warning mb-1">سؤال تفاعلي للجمهور:</div>
+                                    <p className="small text-light opacity-90 mb-0 lh-lg">{note.question}</p>
+                                </div>
+
+                                <div className="p-3 rounded-3" style={{ background: 'rgba(0, 210, 255, 0.1)', border: '1px solid rgba(0, 210, 255, 0.3)' }}>
+                                    <div className="small fw-bold text-electric mb-1">جملة انتقالية للشريحة التالية:</div>
+                                    <div className="small text-light lh-lg">{note.transition}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Slide Index Drawer Component
+           ========================================================================== */
+        const SlideDrawer = ({ isOpen, onClose, currentSlide, onJumpToSlide }) => {
+            if (!isOpen) return null;
+
+            return (
+                <div className="slide-drawer-backdrop" onClick={onClose}>
+                    <div className="slide-drawer-panel" onClick={(e) => e.stopPropagation()}>
+                        <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+                            <h5 className="fw-black mb-0 text-electric">
+                                <i className="fa-solid fa-list-ol me-2"></i>
+                                قائمة الشرائح ({TOTAL_SLIDES})
+                            </h5>
+                            <button className="btn btn-sm btn-outline-light rounded-circle" onClick={onClose} aria-label="إغلاق القائمة">
+                                <i className="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <div>
+                            {SLIDE_INDEX_TITLES.map((item) => {
+                                const active = item.num === currentSlide;
+                                return (
+                                    <div
+                                        key={item.num}
+                                        className={`drawer-slide-item ${active ? 'current' : ''}`}
+                                        onClick={() => {
+                                            onJumpToSlide(item.num);
+                                            onClose();
+                                        }}
+                                    >
+                                        <div className="d-flex justify-content-between align-items-center mb-1">
+                                            <span className="small fw-black text-electric">شريحة {item.num}</span>
+                                            <span className="badge bg-dark text-light border border-secondary border-opacity-25 small">
+                                                {item.tag}
+                                            </span>
+                                        </div>
+                                        <div className="small fw-bold text-light">{item.title}</div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        /* ==========================================================================
+           Main Presentation Engine Application
+           ========================================================================== */
+        const OsintPresentationApp = () => {
+            const [currentSlide, setCurrentSlide] = useState(1);
+            const [revealStep, setRevealStep] = useState(6);
+            const [navDirection, setNavDirection] = useState('next'); // 'next' | 'prev'
+
+            const [presentationMode, setPresentationMode] = useState(false);
+            const [isPaused, setIsPaused] = useState(false);
+            const [transitionMode, setTransitionMode] = useState('cinematic');
+
+            const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+            const [isNotesOpen, setIsNotesOpen] = useState(false);
+            const [isPresenterViewOpen, setIsPresenterViewOpen] = useState(false);
+            const [isFullscreen, setIsFullscreen] = useState(false);
+
+            const [dockVisible, setDockVisible] = useState(true);
+            const [presenterName, setPresenterName] = useState('يزن بلال البعبوع');
+            const [presentationDate, setPresentationDate] = useState('نوفمبر 2026');
+
+            const [elapsedSeconds, setElapsedSeconds] = useState(0);
+            const [nowClockStr, setNowClockStr] = useState('');
+
+            const touchStartXRef = useRef(null);
+            const hideDockTimerRef = useRef(null);
+
+            // Live Digital Clock & Presentation Elapsed Timer
+            useEffect(() => {
+                const updateClock = () => {
+                    const d = new Date();
+                    setNowClockStr(d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+                };
+                updateClock();
+                const clockInterval = setInterval(updateClock, 1000);
+                return () => clearInterval(clockInterval);
+            }, []);
+
+            useEffect(() => {
+                if (isPaused) return;
+                const timerInterval = setInterval(() => {
+                    setElapsedSeconds((s) => s + 1);
+                }, 1000);
+                return () => clearInterval(timerInterval);
+            }, [isPaused]);
+
+            // Auto-hide Control Dock on inactivity during Presentation Mode
+            const triggerDockActivity = () => {
+                setDockVisible(true);
+                if (hideDockTimerRef.current) {
+                    clearTimeout(hideDockTimerRef.current);
+                }
+                if (presentationMode) {
+                    hideDockTimerRef.current = setTimeout(() => {
+                        setDockVisible(false);
+                    }, 3400);
+                }
+            };
+
+            useEffect(() => {
+                triggerDockActivity();
+                return () => {
+                    if (hideDockTimerRef.current) clearTimeout(hideDockTimerRef.current);
+                };
+            }, [presentationMode, currentSlide]);
+
+            const startPresentationFromBeginning = () => {
+                setNavDirection('next');
+                setCurrentSlide(1);
+                setRevealStep(1);
+                setPresentationMode(true);
+                setIsPaused(false);
+                setDockVisible(true);
+            };
+
+            const endPresentationMode = () => {
+                setPresentationMode(false);
+                setIsPresenterViewOpen(false);
+                setDockVisible(true);
+            };
+
+            const restartPresentation = () => {
+                setNavDirection('prev');
+                setCurrentSlide(1);
+                setRevealStep(presentationMode ? 1 : 6);
+                setElapsedSeconds(0);
+                setIsPaused(false);
+            };
+
+            const goToSlide = (num, dir = 'next', startStepped = presentationMode) => {
+                const clamped = Math.max(1, Math.min(TOTAL_SLIDES, num));
+                setNavDirection(dir);
+                setCurrentSlide(clamped);
+                setRevealStep(startStepped ? 1 : 6);
+            };
+
+            // Advance progressive element inside current slide or move to next slide
+            const advanceNext = () => {
+                if (isPaused) return;
+                if (presentationMode && revealStep < 6) {
+                    setRevealStep((prev) => prev + 1);
+                } else if (currentSlide < TOTAL_SLIDES) {
+                    goToSlide(currentSlide + 1, 'next', presentationMode);
+                }
+            };
+
+            // Step back progressive element or move to previous slide
+            const stepPrev = () => {
+                if (isPaused) return;
+                if (presentationMode && revealStep > 1) {
+                    setRevealStep((prev) => prev - 1);
+                } else if (currentSlide > 1) {
+                    goToSlide(currentSlide - 1, 'prev', false);
+                }
+            };
+
+            const toggleFullscreen = () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+                } else {
+                    document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+                }
+            };
+
+            useEffect(() => {
+                const onFsChange = () => setIsFullscreen(Boolean(document.fullscreenElement));
+                document.addEventListener('fullscreenchange', onFsChange);
+                return () => document.removeEventListener('fullscreenchange', onFsChange);
+            }, []);
+
+            // Keyboard Shortcuts (ArrowRight, ArrowLeft, Space, Enter, Home, End, F, N, Esc)
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    const tag = e.target.tagName.toLowerCase();
+                    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+                    triggerDockActivity();
+
+                    switch (e.key) {
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'Enter':
+                            e.preventDefault();
+                            advanceNext();
+                            break;
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            stepPrev();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            goToSlide(1, 'prev', presentationMode);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            goToSlide(TOTAL_SLIDES, 'next', false);
+                            break;
+                        case 'f':
+                        case 'F':
+                            e.preventDefault();
+                            toggleFullscreen();
+                            break;
+                        case 'n':
+                        case 'N':
+                            e.preventDefault();
+                            setIsNotesOpen((prev) => !prev);
+                            break;
+                        case 'Escape':
+                            if (isPresenterViewOpen) {
+                                setIsPresenterViewOpen(false);
+                            } else if (isNotesOpen) {
+                                setIsNotesOpen(false);
+                            } else if (isDrawerOpen) {
+                                setIsDrawerOpen(false);
+                            } else if (presentationMode) {
+                                endPresentationMode();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                };
+
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            });
+
+            // Touch Swipe Support for Mobile & Tablets
+            const handleTouchStart = (e) => {
+                triggerDockActivity();
+                if (e.touches && e.touches.length > 0) {
+                    touchStartXRef.current = e.touches[0].clientX;
+                }
+            };
+
+            const handleTouchEnd = (e) => {
+                if (touchStartXRef.current === null || !e.changedTouches || e.changedTouches.length === 0) return;
+                const diffX = e.changedTouches[0].clientX - touchStartXRef.current;
+                if (Math.abs(diffX) > 55) {
+                    if (diffX > 0) {
+                        advanceNext();
+                    } else {
+                        stepPrev();
+                    }
+                }
+                touchStartXRef.current = null;
+            };
+
+            const renderSlideContent = (slideNum, stepVal) => {
+                switch (slideNum) {
+                    case 1:
+                        return (
+                            <Slide1Title
+                                revealStep={stepVal}
+                                presenterName={presenterName}
+                                setPresenterName={setPresenterName}
+                                presentationDate={presentationDate}
+                                setPresentationDate={setPresentationDate}
+                            />
+                        );
+                    case 2:
+                        return <Slide2Concept revealStep={stepVal} />;
+                    case 3:
+                        return <Slide3Methodology revealStep={stepVal} />;
+                    case 4:
+                        return <Slide4Domains revealStep={stepVal} />;
+                    case 5:
+                        return <Slide5CyberOsint revealStep={stepVal} />;
+                    case 6:
+                        return <Slide6GeoVerification revealStep={stepVal} />;
+                    case 7:
+                        return <Slide7BusinessOsint revealStep={stepVal} />;
+                    case 8:
+                        return <Slide8SocialOsint revealStep={stepVal} />;
+                    case 9:
+                        return <Slide9DigitalFootprint revealStep={stepVal} />;
+                    case 10:
+                        return <Slide10DailyLife revealStep={stepVal} />;
+                    case 11:
+                        return <Slide11EthicsLaw revealStep={stepVal} />;
+                    case 12:
+                        return <Slide12Conclusion revealStep={stepVal} presenterName={presenterName} />;
+                    default:
+                        return <Slide1Title revealStep={stepVal} presenterName={presenterName} setPresenterName={setPresenterName} presentationDate={presentationDate} setPresentationDate={setPresentationDate} />;
+                }
+            };
+
+            const progressPercent = (currentSlide / TOTAL_SLIDES) * 100;
+            const transitionClass = `trans-${transitionMode}`;
+
+            const dynamicMotionStyle = {
+                '--slide-enter-x': navDirection === 'next' ? '-55px' : '55px',
+                '--flip-angle': navDirection === 'next' ? '14deg' : '-14deg'
+            };
+
+            const parallaxGridTransform = `translate3d(${(currentSlide - 6) * -6}px, ${(currentSlide % 3 - 1) * -4}px, 0)`;
+            const parallaxGlowTransform = `translate3d(${(currentSlide - 6) * 10}px, ${(currentSlide % 4 - 1.5) * 6}px, 0)`;
+
+            return (
+                <div
+                    className={`presentation-stage ${presentationMode ? 'presentation-mode-active' : ''}`}
+                    onMouseMove={triggerDockActivity}
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                >
+                    {/* Parallax Technical Grid & Ambient Lighting */}
+                    <div
+                        className="tech-grid-overlay"
+                        style={{ transform: transitionMode === 'parallax' ? parallaxGridTransform : 'none' }}
+                    ></div>
+                    <div
+                        className="ambient-glow-layer"
+                        style={{ transform: transitionMode === 'parallax' ? parallaxGlowTransform : 'none' }}
+                    ></div>
+
+                    {/* Top Presentation Progress Bar */}
+                    <div className="top-progress-wrap" role="progressbar" aria-valuenow={currentSlide} aria-valuemin="1" aria-valuemax={TOTAL_SLIDES}>
+                        <div className="top-progress-fill" style={{ width: `${progressPercent}%` }}></div>
+                    </div>
+
+                    {/* Top Launch & Transition Selector Bar (Hidden during Presentation Mode) */}
+                    {!presentationMode && (
+                        <div className="top-launcher-bar">
+                            <button
+                                className="btn btn-sm fw-black px-3 py-2 rounded-pill shadow"
+                                style={{
+                                    background: 'linear-gradient(135deg, #00d2ff, #8b5cf6)',
+                                    color: '#050811',
+                                    border: 'none'
+                                }}
+                                onClick={startPresentationFromBeginning}
+                            >
+                                <i className="fa-solid fa-play me-1"></i>
+                                بدء العرض التقديمي
+                            </button>
+
+                            <div className="d-flex align-items-center gap-2">
+                                <select
+                                    className="form-select form-select-sm bg-dark text-light border-info border-opacity-40 rounded-pill px-3"
+                                    style={{ width: 'auto' }}
+                                    value={transitionMode}
+                                    onChange={(e) => setTransitionMode(e.target.value)}
+                                    aria-label="إعدادات نوع الانتقال بين الشرائح"
+                                >
+                                    {TRANSITION_MODES.map((m) => (
+                                        <option key={m.id} value={m.id}>{m.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Main Slide Viewport */}
+                    <main className="slide-viewport">
+                        <div
+                            key={`${currentSlide}-${transitionMode}`}
+                            className={`slide-canvas ${transitionClass}`}
+                            style={dynamicMotionStyle}
+                        >
+                            {renderSlideContent(currentSlide, revealStep)}
+                        </div>
+                    </main>
+
+                    {/* Pause Overlay Banner */}
+                    {isPaused && (
+                        <div
+                            className="position-fixed top-50 start-50 translate-middle glass-card p-4 text-center"
+                            style={{ zIndex: 1062, minWidth: '280px' }}
+                        >
+                            <i className="fa-solid fa-pause-circle fs-1 text-warning mb-2 d-block"></i>
+                            <h5 className="fw-black mb-2">العرض متوقف مؤقتاً</h5>
+                            <button className="btn btn-sm btn-info text-dark fw-bold rounded-pill px-4" onClick={() => setIsPaused(false)}>
+                                استئناف العرض
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Slide Index Drawer */}
+                    <SlideDrawer
+                        isOpen={isDrawerOpen}
+                        onClose={() => setIsDrawerOpen(false)}
+                        currentSlide={currentSlide}
+                        onJumpToSlide={(num) => goToSlide(num, num >= currentSlide ? 'next' : 'prev', presentationMode)}
+                    />
+
+                    {/* Speaker Notes Panel (Private to Presenter) */}
+                    <SpeakerNotesPanel
+                        isOpen={isNotesOpen}
+                        onClose={() => setIsNotesOpen(false)}
+                        currentSlide={currentSlide}
+                    />
+
+                    {/* Presenter View Overlay */}
+                    <PresenterViewOverlay
+                        isOpen={isPresenterViewOpen}
+                        onClose={() => setIsPresenterViewOpen(false)}
+                        currentSlide={currentSlide}
+                        goNext={advanceNext}
+                        goPrev={stepPrev}
+                        elapsedSeconds={elapsedSeconds}
+                        nowClockStr={nowClockStr}
+                        renderSlideContent={renderSlideContent}
+                        transitionMode={transitionMode}
+                        setTransitionMode={setTransitionMode}
+                    />
+
+                    {/* Bottom Control Dock (Auto-hides after inactivity during Presentation Mode) */}
+                    <div
+                        className={`control-dock ${!dockVisible ? 'dock-hidden' : ''}`}
+                        role="toolbar"
+                        aria-label="شريط التحكم بالعرض التقديمي"
+                    >
+                        <button
+                            className="dock-btn"
+                            onClick={stepPrev}
+                            disabled={currentSlide === 1 && (!presentationMode || revealStep === 1)}
+                            title="الشريحة / العنصر السابق (سهم اليسار)"
+                        >
+                            <i className="fa-solid fa-chevron-right"></i>
+                            <span className="btn-label">السابق</span>
+                        </button>
+
+                        <span className="slide-counter-pill" title="رقم الشريحة الحالية">
+                            {currentSlide} / {TOTAL_SLIDES}
+                        </span>
+
+                        <button
+                            className="dock-btn"
+                            onClick={advanceNext}
+                            disabled={currentSlide === TOTAL_SLIDES && (!presentationMode || revealStep >= 6)}
+                            title="العنصر / الشريحة التالية (سهم اليمين / Space / Enter)"
+                        >
+                            <span className="btn-label">التالي</span>
+                            <i className="fa-solid fa-chevron-left"></i>
+                        </button>
+
+                        <button
+                            className="dock-btn"
+                            onClick={() => setIsDrawerOpen(true)}
+                            title="قائمة الشرائح"
+                        >
+                            <i className="fa-solid fa-list-ol"></i>
+                            <span className="btn-label">الشرائح</span>
+                        </button>
+
+                        <button
+                            className={`dock-btn ${isNotesOpen ? 'active-mode' : ''}`}
+                            onClick={() => setIsNotesOpen(!isNotesOpen)}
+                            title="ملاحظات المحاضر (N)"
+                        >
+                            <i className="fa-solid fa-note-sticky"></i>
+                            <span className="btn-label">ملاحظات المحاضر</span>
+                        </button>
+
+                        <button
+                            className={`dock-btn ${isPresenterViewOpen ? 'active-mode' : ''}`}
+                            onClick={() => setIsPresenterViewOpen(!isPresenterViewOpen)}
+                            title="وضع مقدم العرض Presenter View"
+                        >
+                            <i className="fa-solid fa-chalkboard-user"></i>
+                            <span className="btn-label">Presenter View</span>
+                        </button>
+
+                        <button
+                            className={`dock-btn ${isPaused ? 'active-mode' : ''}`}
+                            onClick={() => setIsPaused(!isPaused)}
+                            title="إيقاف العرض مؤقتاً / استئناف"
+                        >
+                            <i className={`fa-solid ${isPaused ? 'fa-play' : 'fa-pause'}`}></i>
+                            <span className="btn-label">{isPaused ? 'استئناف' : 'إيقاف مؤقت'}</span>
+                        </button>
+
+                        <button
+                            className="dock-btn"
+                            onClick={restartPresentation}
+                            title="إعادة العرض من البداية (Home)"
+                        >
+                            <i className="fa-solid fa-rotate-left"></i>
+                            <span className="btn-label">إعادة العرض</span>
+                        </button>
+
+                        <button
+                            className={`dock-btn ${isFullscreen ? 'active-mode' : ''}`}
+                            onClick={toggleFullscreen}
+                            title="ملء الشاشة Fullscreen (F)"
+                        >
+                            <i className={`fa-solid ${isFullscreen ? 'fa-compress' : 'fa-expand'}`}></i>
+                            <span className="btn-label">ملء الشاشة</span>
+                        </button>
+
+                        {presentationMode ? (
+                            <button
+                                className="dock-btn"
+                                style={{ borderColor: 'rgba(244, 63, 94, 0.55)', color: '#fda4af' }}
+                                onClick={endPresentationMode}
+                                title="إنهاء وضع التقديم (Esc)"
+                            >
+                                <i className="fa-solid fa-circle-stop"></i>
+                                <span className="btn-label">إنهاء العرض</span>
+                            </button>
+                        ) : (
+                            <button
+                                className="dock-btn active-mode"
+                                onClick={startPresentationFromBeginning}
+                                title="بدء العرض التقديمي من الشريحة الأولى"
+                            >
+                                <i className="fa-solid fa-play"></i>
+                                <span className="btn-label">بدء العرض التقديمي</span>
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<OsintPresentationApp />);
+    </script>
+</body>
+</html>
